@@ -2,22 +2,21 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
-from passlib.context import CryptContext
+import bcrypt
 import httpx
 from app.config import get_settings
 from app.database import get_db
 from app.models.user import find_user_by_id
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 
 def create_access_token(user_id: str) -> str:
@@ -49,7 +48,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 
 async def verify_google_token(token: str) -> dict | None:
-    """Verify Google OAuth token and return user info."""
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.get(
             "https://www.googleapis.com/oauth2/v3/userinfo",

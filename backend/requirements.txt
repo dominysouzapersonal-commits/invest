@@ -16,6 +16,6 @@ aiofiles
 motor
 pymongo[srv]
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt
 authlib
 email-validator
