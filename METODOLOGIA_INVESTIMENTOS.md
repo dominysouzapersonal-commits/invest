@@ -60,15 +60,19 @@ Analisar no mínimo 40 ativos distribuídos em:
 
 "Nunca pagar caro, mesmo por uma empresa boa." — Graham
 
-| Indicador | Ideal | Bom | Ruim | Fonte |
-|---|---|---|---|---|
-| P/L (Preço/Lucro) | < 12 | 12-20 | > 30 | brapi/FMP |
-| P/VP (Preço/Valor Patrimonial) | < 1.5 | 1.5-3 | > 5 | brapi/FMP |
-| EV/EBITDA | < 7 | 7-12 | > 18 | brapi/FMP |
-| P/FCF (Preço/Free Cash Flow) | < 12 | 12-20 | > 30 | FMP |
-| PEG Ratio | < 1 | 1-2 | > 3 | brapi/FMP |
+| Indicador | Ideal | Bom | Ruim | Fonte | Quando usar |
+|---|---|---|---|---|---|
+| P/L (Preço/Lucro) | < 12 | 12-20 | > 30 | brapi/FMP | Sempre (exceto prejuízo) |
+| P/VP (Preço/Valor Patrimonial) | < 1.5 | 1.5-3 | > 5 | brapi/FMP | Sempre |
+| EV/EBITDA | < 7 | 7-12 | > 18 | brapi/FMP | Sempre (melhor que P/L para endividadas) |
+| EV/Revenue (EV/Receita) | < 2 | 2-5 | > 8 | brapi/FMP | Para empresas em prejuízo ou margens baixas (techs, growth) |
+| P/FCF (Preço/Free Cash Flow) | < 12 | 12-20 | > 30 | FMP | Sempre que FCF disponível |
+| PEG Ratio | < 1 | 1-2 | > 3 | brapi/FMP | Para growth stocks (P/L ajustado pelo crescimento) |
 
-**Regra:** P/L negativo = empresa com prejuízo = penalidade máxima.
+**Regras:**
+- P/L negativo = empresa com prejuízo = penalidade máxima.
+- Se P/L não disponível (prejuízo), usar EV/Revenue como substituto.
+- EV/EBITDA é mais confiável que P/L porque inclui dívida e ignora estrutura de capital.
 
 ### Critério 2: Rentabilidade (Peso 20%)
 
@@ -115,6 +119,12 @@ Analisar no mínimo 40 ativos distribuídos em:
 
 **Cálculo do DY:** Somar todos os dividendos e JCP pagos nos últimos 12 meses, dividir pelo preço atual. Usar dados reais da brapi (dividendsData.cashDividends).
 
+**Separação Dividendo vs JCP:**
+- **Dividendo** = isento de IR para pessoa física. O que entra na conta é líquido.
+- **JCP (Juros sobre Capital Próprio)** = 15% de IR retido na fonte. DY de 10% em JCP = 8.5% líquido.
+- Na brapi, o campo `label` em `cashDividends` indica: "DIVIDENDO" ou "JCP".
+- **Regra:** Ao comparar DY entre empresas, calcular o **DY líquido** (dividendo integral + JCP × 0.85). Preferir empresas que pagam mais em dividendo do que JCP.
+
 ### Critério 5: Endividamento e Solidez (Peso 10%)
 
 | Indicador | Ideal | Bom | Perigoso |
@@ -123,8 +133,11 @@ Analisar no mínimo 40 ativos distribuídos em:
 | Dív. Líquida / PL | < 0.5 | 0.5-1.5 | > 2.5 |
 | Liquidez Corrente | > 2.0 | 1.2-2.0 | < 0.8 |
 | Cobertura de Juros | > 8x | 3-8x | < 1.5x |
+| **FCF / Dív. Total** | > 25% | 15-25% | < 10% |
 
 **Regra:** Empresa com Dív/EBITDA > 4 em cenário de SELIC alta (> 12%) é risco real de stress financeiro. Aplicar penalidade forte.
+
+**FCF / Dívida Total:** Indica quantos anos a empresa leva para quitar toda a dívida com caixa livre. FCF/Dív > 25% = quita em ~4 anos. FCF/Dív < 10% = levaria 10+ anos = perigoso. Este indicador diferencia empresas com dívida alta mas que geram caixa (aceitável) de empresas com dívida alta e caixa fraco (perigoso).
 
 ### Critério 6: Crescimento (Peso 10%)
 
