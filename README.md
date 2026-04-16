@@ -1,6 +1,6 @@
 # InvestAnalytics
 
-Plataforma web de analise fundamentalista de investimentos com autenticacao, cobrindo acoes BR, FIIs, acoes US, ETFs e BDRs. Deploy no Vercel + Render + MongoDB Atlas.
+Plataforma web de análise fundamentalista de investimentos com autenticação, cobrindo ações BR, FIIs, ações US, ETFs e BDRs. Deploy no Vercel + Render + MongoDB Atlas.
 
 ## Stack
 
@@ -8,7 +8,16 @@ Plataforma web de analise fundamentalista de investimentos com autenticacao, cob
 - **Backend**: Python, FastAPI, Motor (Render)
 - **Database**: MongoDB Atlas
 - **Auth**: JWT + Google OAuth
-- **Dados**: brapi.dev, yfinance, Financial Modeling Prep, Fundamentus
+- **Dados**: brapi.dev (Premium), Financial Modeling Prep (Pago)
+
+## Documentação
+
+| Documento | Descrição |
+|---|---|
+| [`docs/METODOLOGIA_INVESTIMENTOS.md`](docs/METODOLOGIA_INVESTIMENTOS.md) | Metodologia completa de análise (10 critérios, pesos, benchmarks, red flags) |
+| [`docs/RELATORIO_COMPLETO.md`](docs/RELATORIO_COMPLETO.md) | Relatório de análise de 77 ativos com carteira sugerida para R$ 6.700 |
+| [`docs/BRAPI_REFERENCE.md`](docs/BRAPI_REFERENCE.md) | Referência da API brapi.dev (endpoints, módulos, SDK) |
+| [`docs/FMP_REFERENCE.md`](docs/FMP_REFERENCE.md) | Referência da API FMP (150+ endpoints, 26 categorias) |
 
 ## Desenvolvimento Local
 
@@ -42,25 +51,16 @@ npm run dev
 ### 2. Backend (Render)
 
 - Criar conta em https://render.com
-- New Web Service > conectar repositorio Git
+- New Web Service > conectar repositório Git
 - Root directory: `backend`
 - Build command: `pip install -r requirements.txt`
 - Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Adicionar environment variables: `MONGODB_URI`, `BRAPI_TOKEN`, `FMP_API_KEY`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FRONTEND_URL`
+- Adicionar environment variables: `MONGODB_URI`, `BRAPI_TOKEN`, `FMP_API_KEY`, `JWT_SECRET`, `FRONTEND_URL`
 
 ### 3. Frontend (Vercel)
 
 - Criar conta em https://vercel.com
-- Import > conectar repositorio Git
+- Import > conectar repositório Git
 - Root directory: `frontend`
 - Framework: Vite
-- Adicionar environment variable: `VITE_API_URL` = URL do Render (ex: `https://investanalytics-api.onrender.com`)
-- Opcional: `VITE_GOOGLE_CLIENT_ID` para login com Google
-
-### 4. Google OAuth (opcional)
-
-- Ir em https://console.cloud.google.com
-- APIs & Services > Credentials > Create OAuth 2.0 Client ID
-- Tipo: Web application
-- Authorized redirect URIs: `https://seu-app.vercel.app/auth/google/callback`
-- Copiar Client ID e Client Secret para as env vars
+- Adicionar environment variable: `VITE_API_URL` = URL do Render
