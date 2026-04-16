@@ -7,14 +7,14 @@ interface MetricCardProps {
 
 export default function MetricCard({ label, value, suffix = '', positive }: MetricCardProps) {
   const colorClass =
-    positive === true ? 'text-success' :
-    positive === false ? 'text-danger' :
-    'text-white';
+    positive === true ? 'text-gain' :
+    positive === false ? 'text-loss' :
+    'text-text-primary';
 
   return (
-    <div className="bg-dark-bg/50 rounded-lg p-3 border border-dark-border/50">
-      <p className="text-xs text-dark-muted mb-1">{label}</p>
-      <p className={`text-lg font-semibold ${colorClass}`}>
+    <div className="py-2">
+      <p className="text-[11px] text-text-muted uppercase tracking-wider mb-1">{label}</p>
+      <p className={`text-[17px] font-semibold tabular-nums ${colorClass}`}>
         {value != null ? `${value}${suffix}` : '—'}
       </p>
     </div>
