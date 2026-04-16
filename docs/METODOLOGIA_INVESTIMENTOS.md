@@ -241,7 +241,118 @@ Score Final = Score Base + Bônus Governança + Bônus Insider/Scores
 
 ---
 
-## 6. Regras de Alocação (para R$ 6.700)
+## 6. Análise de FIIs — Metodologia Específica
+
+FIIs não são empresas. Não têm DRE, não têm ROE, não têm margem líquida. A análise de FIIs usa critérios **completamente diferentes** de ações. Esta seção documenta como analisar FIIs de forma completa.
+
+### 6.1 Tipos de FIIs
+
+| Tipo | Exemplos | Renda vem de | Sensibilidade à SELIC |
+|---|---|---|---|
+| **Papel (CRI/CRA)** | KNCR11, KNIP11, MXRF11, CPTS11 | Juros de recebíveis imobiliários | Beneficiado pela SELIC alta (renda sobe) |
+| **Tijolo — Logística** | HGLG11, BTLG11, XPLG11 | Aluguel de galpões | Prejudicado pela SELIC alta (cotas caem) |
+| **Tijolo — Shoppings** | XPML11, VISC11, HSML11 | Aluguel de lojas + % vendas | Prejudicado (consumo cai) |
+| **Tijolo — Lajes corporativas** | HGRE11, BRCR11, PVBI11 | Aluguel de escritórios | Prejudicado |
+| **Híbrido** | MXRF11, KNRI11 | Mix papel + tijolo | Intermediário |
+| **FoF (Fundo de Fundos)** | SNFF11, BCFF11 | Dividendos de outros FIIs | Intermediário |
+| **Agro** | RZTR11 | Arrendamento de terras | Pouco sensível à SELIC |
+| **Renda Urbana** | TRXF11, RBVA11 | Contratos atípicos (lojas, agências) | Intermediário |
+
+### 6.2 Indicadores para FIIs
+
+#### Indicadores disponíveis via API (brapi)
+
+| Indicador | Como obter | Benchmarks |
+|---|---|---|
+| **Dividend Yield 12m** | Somar cashDividends dos últimos 12 meses / preço | Papel: > 10% bom. Tijolo: > 7% bom |
+| **P/VP** | defaultKeyStatistics.priceToBook | < 0.95 = desconto. 0.95-1.05 = justo. > 1.10 = prêmio |
+| **Valor Patrimonial/cota** | defaultKeyStatistics.bookValue | Referência para P/VP |
+| **Dividendo mensal médio** | Total 12m / 12 | Estabilidade mês a mês |
+| **Consistência de pagamento** | Contar anos pagando (2019+) | > 5 anos = consistente |
+| **Tendência do dividendo** | Comparar 1a metade vs 2a metade do histórico | Crescente = bom |
+| **Volume diário** | regularMarketVolume | > 50.000 = liquidez OK |
+| **52 semanas alta/baixa** | fiftyTwoWeekHigh/Low | Proximidade da mínima = oportunidade |
+
+#### Indicadores NÃO disponíveis via API (só no relatório gerencial mensal)
+
+| Indicador | O que mede | Onde encontrar | Aplicável a |
+|---|---|---|---|
+| **Vacância física** | % da área desocupada | Relatório gerencial (PDF na CVM/Fnet) | Tijolo |
+| **Vacância financeira** | % da receita potencial não recebida | Relatório gerencial | Tijolo |
+| **Cap Rate** | Renda / valor dos imóveis | Relatório gerencial ou Bianco Valuations | Tijolo |
+| **WALE** | Prazo médio dos contratos (anos) | Relatório gerencial | Tijolo e Renda Urbana |
+| **Inadimplência** | % dos CRIs/inquilinos inadimplentes | Relatório gerencial | Papel e Tijolo |
+| **Duration / prazo médio** | Prazo médio dos CRIs | Relatório gerencial | Papel |
+| **Indexador** | CDI, IPCA, IGP-M, fixo | Relatório gerencial ou site do fundo | Papel |
+| **Concentração** | % em um único ativo/inquilino | Relatório gerencial | Todos |
+| **Aluguel/m² médio** | Receita por metro quadrado | Relatório gerencial | Lajes e Logística |
+
+### 6.3 Scoring de FIIs (adaptado)
+
+Para FIIs, o scoring usa pesos diferentes de ações:
+
+```
+Score FII = (
+    DY 12m                × 0.35 +
+    Consistência/Tendência × 0.20 +
+    P/VP                   × 0.20 +
+    Liquidez (volume)      × 0.10 +
+    Tipo vs Cenário Macro  × 0.15
+)
+```
+
+| Componente | Score 100 | Score 65 | Score 30 |
+|---|---|---|---|
+| DY 12m (papel) | > 12% | 8-12% | < 6% |
+| DY 12m (tijolo) | > 8% | 6-8% | < 4% |
+| Consistência | > 5 anos + crescente | 3-5 anos + estável | < 3 anos ou declinante |
+| P/VP | < 0.95 (desconto) | 0.95-1.10 (justo) | > 1.15 (prêmio) |
+| Volume | > 100k/dia | 30-100k/dia | < 10k/dia |
+| Tipo vs Macro | Papel com SELIC > 12% | Híbrido | Tijolo com SELIC > 12% |
+
+### 6.4 Regras de decisão para FIIs
+
+**SELIC > 12% (cenário atual):**
+- Priorizar **papel** (CDI+, IPCA+)
+- Evitar tijolo (cotas tendem a cair)
+- FIIs de papel pagam DY > CDI líquido = melhor que CDB
+
+**SELIC entre 8-12%:**
+- Mix papel + tijolo
+- Começar a posicionar em tijolo de qualidade (HGLG11, BTLG11)
+
+**SELIC < 8%:**
+- Priorizar **tijolo** (cotas se valorizam, DY nominal cai mas ganho de capital compensa)
+- Papel paga menos, migrar gradualmente
+
+**Red flags de FIIs:**
+1. DY > 18% sustentado — pode ser insustentável ou amortização de capital (não é rendimento real)
+2. P/VP > 1.20 — pagando 20% acima do patrimônio
+3. Volume < 5.000/dia — liquidez perigosa, spread alto
+4. Vacância > 20% (tijolo) — muita área vazia
+5. Concentração > 50% em um único ativo — risco concentrado
+6. Gestora desconhecida — preferir Kinea, Patria, XP, BTG, Vinci, RBR, Capitânia
+
+### 6.5 APIs para Dados de FIIs
+
+| Fonte | O que fornece | Tipo | Custo |
+|---|---|---|---|
+| **brapi.dev** | Cotação, P/VP, dividendos históricos, book value | API | Já contratada (Premium) |
+| **Dados de Mercado** (dadosdemercado.com.br) | Lista de FIIs, dividendos, setor, CNPJ | API REST | Pago (tem free tier) |
+| **Funds Explorer** (fundsexplorer.com.br) | Vacância, DY, P/VP, cap rate, relatórios | Site (sem API oficial) | Gratuito (web) |
+| **Status Invest** (statusinvest.com.br) | Indicadores completos, histórico | Site (sem API oficial) | Gratuito (web) |
+| **Bianco Valuations** (biancovaluations.com) | Screening 400+ FIIs, vacância, cap rate, valuation (DDM, Bazin) | Site | Pago |
+| **BrFiis** (brfiis.com.br) | Relatórios gerenciais, documentos CVM | Site | Gratuito |
+| **CVM/Fnet** (fnet.bmfbovespa.com.br) | Relatórios gerenciais oficiais (PDF) | Site governo | Gratuito |
+
+**Nota:** Nenhuma API pública fornece vacância, cap rate ou inadimplência programaticamente. Esses dados existem apenas nos relatórios gerenciais mensais (PDFs) ou em plataformas pagas como Bianco Valuations. Para integração futura, seria necessário:
+- Scraping de Funds Explorer ou Status Invest (frágil, pode quebrar)
+- Assinatura do Bianco Valuations (se tiver API)
+- Parser de PDFs dos relatórios gerenciais via CVM/Fnet (complexo)
+
+---
+
+## 7. Regras de Alocação (para R$ 6.700)
 
 ### Estrutura aprovada
 
@@ -276,7 +387,7 @@ Score Final = Score Base + Bônus Governança + Bônus Insider/Scores
 
 ---
 
-## 7. Regras de Cenário Macro
+## 8. Regras de Cenário Macro
 
 A análise deve considerar o cenário macroeconômico:
 
@@ -305,7 +416,7 @@ A análise deve considerar o cenário macroeconômico:
 
 ---
 
-## 8. Processo de Análise (Passo a Passo)
+## 9. Processo de Análise (Passo a Passo)
 
 ### Fase 1: Coleta (automatizada)
 1. Puxar cotações e fundamentalistas via brapi (batch 20)
@@ -338,7 +449,7 @@ A análise deve considerar o cenário macroeconômico:
 
 ---
 
-## 9. Red Flags — Nunca Comprar Se
+## 10. Red Flags — Nunca Comprar Se
 
 1. Prejuízo líquido nos últimos 3 anos consecutivos
 2. FCF negativo nos últimos 3 anos consecutivos
@@ -353,7 +464,7 @@ A análise deve considerar o cenário macroeconômico:
 
 ---
 
-## 10. Glossário Rápido
+## 11. Glossário Rápido
 
 | Termo | Significado |
 |---|---|
