@@ -14,7 +14,8 @@ Plataforma web de análise fundamentalista de investimentos com autenticação, 
 
 | Documento | Descrição |
 |---|---|
-| [`docs/METODOLOGIA_INVESTIMENTOS.md`](docs/METODOLOGIA_INVESTIMENTOS.md) | Metodologia completa de análise (10 critérios, pesos, benchmarks, red flags) |
+| [`docs/PROJETO_COMPLETO.md`](docs/PROJETO_COMPLETO.md) | **Documentação completa do projeto** (stack, endpoints, arquivos, fluxos, deploy) |
+| [`docs/METODOLOGIA_INVESTIMENTOS.md`](docs/METODOLOGIA_INVESTIMENTOS.md) | Metodologia de análise de investimentos (10 critérios, pesos, benchmarks) |
 | [`docs/RELATORIO_COMPLETO.md`](docs/RELATORIO_COMPLETO.md) | Relatório de análise de 77 ativos com carteira sugerida para R$ 6.700 |
 | [`docs/BRAPI_REFERENCE.md`](docs/BRAPI_REFERENCE.md) | Referência da API brapi.dev (endpoints, módulos, SDK) |
 | [`docs/FMP_REFERENCE.md`](docs/FMP_REFERENCE.md) | Referência da API FMP (150+ endpoints, 26 categorias) |
