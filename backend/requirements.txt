@@ -19,3 +19,4 @@ python-jose[cryptography]
 bcrypt
 authlib
 email-validator
+brapi
