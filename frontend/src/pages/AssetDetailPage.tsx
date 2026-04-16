@@ -127,13 +127,14 @@ export default function AssetDetailPage() {
       )}
 
       {/* Advanced */}
-      {(f.recommendation_key || f.piotroski_score != null || f.altman_z_score != null) && (
-        <div className="flex gap-10 mb-8">
+      {(f.recommendation_key || f.piotroski_score != null || f.altman_z_score != null || f.dcf_value != null || f.rsi_14 != null) && (
+        <div className="flex flex-wrap gap-10 mb-8">
           {f.recommendation_key && (
             <div>
               <p className="text-[11px] text-text-muted mb-1">Analistas</p>
               <p className="text-base font-semibold text-text-primary capitalize">{f.recommendation_key}</p>
               {f.target_mean_price && <p className="text-[11px] text-text-muted">Alvo: {f.currency === 'BRL' ? 'R$' : '$'}{f.target_mean_price.toFixed(2)}</p>}
+              {f.number_of_analysts && <p className="text-[10px] text-text-faint">{f.number_of_analysts} analistas</p>}
             </div>
           )}
           {f.piotroski_score != null && (
@@ -146,6 +147,31 @@ export default function AssetDetailPage() {
             <div>
               <p className="text-[11px] text-text-muted mb-1">Altman Z</p>
               <p className={`text-base font-semibold ${f.altman_z_score > 2.99 ? 'text-gain' : f.altman_z_score > 1.81 ? 'text-text-primary' : 'text-loss'}`}>{f.altman_z_score.toFixed(2)}</p>
+            </div>
+          )}
+          {f.dcf_value != null && (
+            <div>
+              <p className="text-[11px] text-text-muted mb-1">DCF (Valor Justo)</p>
+              <p className="text-base font-semibold text-text-primary">{f.currency === 'BRL' ? 'R$' : '$'}{f.dcf_value.toFixed(2)}</p>
+              {f.dcf_upside_pct != null && (
+                <p className={`text-[11px] ${f.dcf_upside_pct > 0 ? 'text-gain' : 'text-loss'}`}>
+                  {f.dcf_upside_pct > 0 ? '+' : ''}{f.dcf_upside_pct.toFixed(1)}% upside
+                </p>
+              )}
+            </div>
+          )}
+          {f.rsi_14 != null && (
+            <div>
+              <p className="text-[11px] text-text-muted mb-1">RSI (14)</p>
+              <p className={`text-base font-semibold ${f.rsi_14 > 70 ? 'text-loss' : f.rsi_14 < 30 ? 'text-gain' : 'text-text-primary'}`}>{f.rsi_14.toFixed(0)}</p>
+              <p className="text-[10px] text-text-faint">{f.rsi_14 > 70 ? 'Sobrecomprado' : f.rsi_14 < 30 ? 'Sobrevendido' : 'Neutro'}</p>
+            </div>
+          )}
+          {f.sma_50 != null && (
+            <div>
+              <p className="text-[11px] text-text-muted mb-1">SMA 50/200</p>
+              <p className="text-base font-semibold text-text-primary">{f.sma_50.toFixed(2)}</p>
+              {f.sma_200 != null && <p className="text-[10px] text-text-faint">200d: {f.sma_200.toFixed(2)}</p>}
             </div>
           )}
         </div>
@@ -180,6 +206,14 @@ export default function AssetDetailPage() {
           { l: 'Lucro 1a', v: f.profit_growth_1y?.toFixed(1), s: '%', p: f.profit_growth_1y != null ? f.profit_growth_1y > 0 : null },
           { l: 'Lucro 3a', v: f.profit_growth_3y?.toFixed(1), s: '%', p: f.profit_growth_3y != null ? f.profit_growth_3y > 0 : null },
           { l: 'Lucro 5a', v: f.profit_growth_5y?.toFixed(1), s: '%', p: f.profit_growth_5y != null ? f.profit_growth_5y > 0 : null },
+        ]},
+        { title: 'Per-share & Yields', items: [
+          { l: 'LPA', v: f.eps?.toFixed(2) },
+          { l: 'VPA', v: f.book_value_per_share?.toFixed(2) },
+          { l: 'FCF/ação', v: f.fcf_per_share?.toFixed(2) },
+          { l: 'Earn. Yield', v: f.earnings_yield != null ? (f.earnings_yield * 100).toFixed(1) : undefined, s: '%', p: f.earnings_yield != null ? f.earnings_yield > 0.05 : null },
+          { l: 'FCF Yield', v: f.fcf_yield != null ? (f.fcf_yield * 100).toFixed(1) : undefined, s: '%', p: f.fcf_yield != null ? f.fcf_yield > 0.05 : null },
+          { l: 'Fwd P/E', v: f.forward_pe?.toFixed(1) },
         ]},
       ].map(section => (
         <div key={section.title} className="mb-6">

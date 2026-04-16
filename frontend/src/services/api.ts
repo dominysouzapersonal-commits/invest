@@ -2,6 +2,7 @@ import axios from 'axios';
 import type {
   AssetSearch, AssetDetail, ScoreResult, PortfolioSummary,
   PositionResponse, CompareResult, WatchlistItem, ScoringWeights,
+  FullReport,
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -105,4 +106,9 @@ export const watchlistApi = {
 
   remove: (id: string) =>
     api.delete(`/watchlist/${id}`).then(r => r.data),
+};
+
+export const reportApi = {
+  getFullAnalysis: () =>
+    api.get<FullReport>('/report/full-analysis', { timeout: 120000 }).then(r => r.data),
 };

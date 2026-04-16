@@ -4,7 +4,7 @@ from app.models.watchlist import find_watchlist, add_watchlist_item, remove_watc
 from app.schemas.portfolio import WatchlistCreate, WatchlistResponse
 from app.services.analysis_engine import get_full_asset_data
 from app.services.scoring import calculate_score
-from app.services.data_providers import brapi, yfinance_provider
+from app.services.data_providers import brapi, fmp
 from app.utils.auth import get_current_user
 from pymongo.errors import DuplicateKeyError
 
@@ -24,7 +24,7 @@ async def list_watchlist_items(user: dict = Depends(get_current_user)):
                 quote = await brapi.get_quote(item["ticker"])
                 current_price = quote.get("price") if quote else None
             else:
-                quote = yfinance_provider.get_quote(item["ticker"])
+                quote = await fmp.get_quote(item["ticker"])
                 current_price = quote.get("price") if quote else None
 
             data = await get_full_asset_data(item["ticker"])

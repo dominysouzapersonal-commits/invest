@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.models.portfolio import find_positions, find_position_by_ticker, create_position, update_position, create_transaction
 from app.schemas.portfolio import PortfolioSummary, PositionResponse
-from app.services.data_providers import brapi, yfinance_provider
+from app.services.data_providers import brapi, fmp
 
 
 async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> PortfolioSummary:
@@ -69,7 +69,7 @@ async def _get_current_price(ticker: str, asset_type: str) -> float | None:
             quote = await brapi.get_quote(ticker)
             return quote.get("price") if quote else None
         else:
-            quote = yfinance_provider.get_quote(ticker)
+            quote = await fmp.get_quote(ticker)
             return quote.get("price") if quote else None
     except Exception:
         return None

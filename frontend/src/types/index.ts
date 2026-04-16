@@ -22,11 +22,14 @@ export interface FundamentalData {
   sector?: string;
   industry?: string;
   currency: string;
+  description?: string;
+  logo_url?: string;
   price?: number;
   change_percent?: number;
   market_cap?: number;
   volume?: number;
   pe_ratio?: number;
+  forward_pe?: number;
   pb_ratio?: number;
   ev_ebitda?: number;
   psr?: number;
@@ -43,6 +46,9 @@ export interface FundamentalData {
   profit_growth_1y?: number;
   profit_growth_3y?: number;
   profit_growth_5y?: number;
+  ebitda_growth_1y?: number;
+  eps_growth_1y?: number;
+  fcf_growth_1y?: number;
   dividend_yield?: number;
   payout_ratio?: number;
   dividend_consistency?: number;
@@ -59,15 +65,35 @@ export interface FundamentalData {
   cap_rate?: number;
   peg_ratio?: number;
   price_to_fcf?: number;
+  ev_revenue?: number;
   operating_margin?: number;
   quick_ratio?: number;
   interest_coverage?: number;
+  debt_to_equity?: number;
+  debt_to_assets?: number;
   altman_z_score?: number;
   piotroski_score?: number;
+  dcf_value?: number;
+  dcf_upside_pct?: number;
   recommendation_key?: string;
+  recommendation_mean?: number;
   target_mean_price?: number;
+  target_high_price?: number;
+  target_low_price?: number;
   number_of_analysts?: number;
+  grades_consensus?: Record<string, any>;
+  price_target_consensus?: Record<string, any>;
+  rsi_14?: number;
+  sma_50?: number;
+  sma_200?: number;
+  eps?: number;
+  book_value_per_share?: number;
+  fcf_per_share?: number;
+  earnings_yield?: number;
+  fcf_yield?: number;
   peers?: string[];
+  recent_news?: Array<Record<string, any>>;
+  insider_trades?: Array<Record<string, any>>;
 }
 
 export interface ScoreResult {
@@ -160,3 +186,69 @@ export const RECOMMENDATION_COLORS: Record<string, string> = {
   'Cautela': 'text-orange-400',
   'Evitar': 'text-red-400',
 };
+
+export interface AssetAnalysis {
+  ticker: string;
+  name: string;
+  asset_type: string;
+  sector?: string;
+  price?: number;
+  currency: string;
+  market_cap?: number;
+  logo_url?: string;
+  score: number;
+  recommendation: string;
+  valuation_score: number;
+  profitability_score: number;
+  dividends_score: number;
+  debt_score: number;
+  growth_score: number;
+  pe_ratio?: number;
+  pb_ratio?: number;
+  ev_ebitda?: number;
+  roe?: number;
+  roic?: number;
+  net_margin?: number;
+  dividend_yield?: number;
+  net_debt_ebitda?: number;
+  current_ratio?: number;
+  revenue_growth_1y?: number;
+  profit_growth_1y?: number;
+  piotroski_score?: number;
+  altman_z_score?: number;
+  dcf_value?: number;
+  dcf_upside_pct?: number;
+  recommendation_key?: string;
+  target_mean_price?: number;
+  rsi_14?: number;
+  why_yes?: string;
+  why_no?: string;
+}
+
+export interface CategoryRecommendation {
+  category: string;
+  category_label: string;
+  target_pct: number;
+  target_amount: number;
+  assets: AssetAnalysis[];
+  top_pick?: string;
+  rationale: string;
+}
+
+export interface MacroData {
+  selic_current?: number;
+  ipca_current?: number;
+  usd_brl?: number;
+  eur_brl?: number;
+}
+
+export interface FullReport {
+  generated_at: string;
+  investor_profile: Record<string, any>;
+  macro: MacroData;
+  total_assets_analyzed: number;
+  categories: CategoryRecommendation[];
+  all_assets: AssetAnalysis[];
+  portfolio_summary: Record<string, any>;
+  methodology: string;
+}
