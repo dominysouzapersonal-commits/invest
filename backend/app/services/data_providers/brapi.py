@@ -228,7 +228,7 @@ async def get_historical(ticker: str, range_: str = "1y", interval: str = "1d") 
     hist = results[0].get("historicalDataPrice", [])
     return [
         {
-            "date": p.get("date", ""),
+            "date": _to_date_str(p.get("date", "")),
             "open": round(p.get("open", 0), 2),
             "high": round(p.get("high", 0), 2),
             "low": round(p.get("low", 0), 2),
@@ -238,6 +238,14 @@ async def get_historical(ticker: str, range_: str = "1y", interval: str = "1d") 
         for p in hist
         if p.get("close") is not None
     ]
+
+
+def _to_date_str(val) -> str:
+    """Convert brapi date (can be unix timestamp int or string) to YYYY-MM-DD."""
+    if isinstance(val, (int, float)):
+        from datetime import datetime, timezone
+        return datetime.fromtimestamp(val, tz=timezone.utc).strftime("%Y-%m-%d")
+    return str(val) if val else ""
 
 
 # ---------------------------------------------------------------------------

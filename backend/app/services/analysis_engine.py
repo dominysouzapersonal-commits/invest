@@ -7,23 +7,26 @@ logger = logging.getLogger(__name__)
 
 
 def detect_asset_type(ticker: str) -> str:
-    t = ticker.upper()
-    if ".SA" in t or ("." not in t and _is_br_ticker(t)):
-        clean = t.replace(".SA", "")
-        if clean.endswith("11") and len(clean) >= 6:
+    t = ticker.upper().replace(".SA", "")
+    if ".SA" in ticker.upper() or _is_br_ticker(t):
+        if t.endswith("11") and len(t) >= 6:
             return "fii"
-        if clean.endswith(("34", "35", "33")) and len(clean) >= 5:
+        if t.endswith(("34", "35", "33")) and len(t) >= 5:
             return "bdr"
         return "br_stock"
     return "us_stock"
 
 
 def _is_br_ticker(ticker: str) -> bool:
+    """Detect BR B3 tickers: 4 letters + 1-2 digits (PETR4, VALE3, HGLG11, SANB11)."""
     if len(ticker) < 5 or len(ticker) > 6:
         return False
-    letters = ticker[:-1] if ticker[-1].isdigit() else ticker[:-2]
-    digits = ticker[len(letters):]
-    return letters.isalpha() and digits.isdigit()
+    for split_at in (4, 3):
+        letters = ticker[:split_at]
+        digits = ticker[split_at:]
+        if letters.isalpha() and digits.isdigit():
+            return True
+    return False
 
 
 async def get_full_asset_data(ticker: str) -> FundamentalData:
