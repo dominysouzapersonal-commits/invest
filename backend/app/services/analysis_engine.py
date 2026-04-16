@@ -52,9 +52,12 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
     quote_data = quote_data if isinstance(quote_data, dict) else {}
     brapi_fund = brapi_fund if isinstance(brapi_fund, dict) else {}
 
+    # For FIIs: calculate DY from actual dividend payments
+    if asset_type == "fii":
+        _enrich_fii_data(quote_data, brapi_fund)
+
     # FMP enrichment for BR BDRs (they may have US tickers) — optional
     fmp_scores: dict = {}
-    fmp_dcf: dict | None = None
     if asset_type == "bdr":
         try:
             fmp_scores = await fmp.get_financial_scores(clean) or {}
@@ -73,6 +76,58 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
     }
 
     return _build_fundamental_data(ticker, asset_type, quote_data, brapi_fund, extra)
+
+
+def _enrich_fii_data(quote_data: dict, brapi_fund: dict) -> None:
+    """Calculate DY, monthly avg, and dividend consistency from actual payments."""
+    from datetime import datetime
+
+    divs_data = quote_data.get("dividends_data")
+    if not divs_data or not isinstance(divs_data, dict):
+        return
+
+    cash_divs = divs_data.get("cashDividends", [])
+    price = quote_data.get("price")
+    if not cash_divs or not price or price <= 0:
+        return
+
+    now = datetime.now()
+    one_year_ago = now.replace(year=now.year - 1)
+
+    total_12m = 0.0
+    payments_12m = 0
+    for d in cash_divs:
+        try:
+            pay_str = d.get("paymentDate", "")[:10]
+            pay_date = datetime.strptime(pay_str, "%Y-%m-%d")
+            if pay_date >= one_year_ago:
+                total_12m += float(d.get("rate", 0))
+                payments_12m += 1
+        except (ValueError, TypeError):
+            continue
+
+    if total_12m > 0:
+        dy = round(total_12m / price * 100, 2)
+        monthly_avg = round(total_12m / 12, 4)
+
+        quote_data["dividend_yield"] = dy
+        brapi_fund["dividend_yield"] = dy
+        quote_data["_fii_monthly_dividend"] = monthly_avg
+        quote_data["_fii_payments_12m"] = payments_12m
+        quote_data["_fii_total_div_12m"] = round(total_12m, 4)
+
+    # Count years paying dividends (2020+)
+    yearly: dict[int, float] = {}
+    for d in cash_divs:
+        try:
+            yr = int(d.get("paymentDate", "")[:4])
+            if yr >= 2019:
+                yearly[yr] = yearly.get(yr, 0) + float(d.get("rate", 0))
+        except (ValueError, TypeError):
+            continue
+
+    years_paying = len([v for v in yearly.values() if v > 0])
+    quote_data["_fii_years_paying"] = years_paying
 
 
 async def _fetch_us_asset(ticker: str, asset_type: str) -> FundamentalData:
