@@ -1,21 +1,16 @@
 import { ASSET_TYPE_LABELS } from '../../types';
 
-interface BadgeProps {
-  type: string;
-  className?: string;
-}
-
-const TYPE_COLORS: Record<string, string> = {
-  br_stock: 'text-blue-400',
-  fii: 'text-purple-400',
-  us_stock: 'text-emerald-400',
-  us_etf: 'text-cyan-400',
-  bdr: 'text-amber-400',
+const COLORS: Record<string, string> = {
+  br_stock: 'text-blue-400/80',
+  fii: 'text-purple-400/80',
+  us_stock: 'text-emerald-400/80',
+  us_etf: 'text-cyan-400/80',
+  bdr: 'text-amber-400/80',
 };
 
-export default function Badge({ type, className = '' }: BadgeProps) {
+export default function Badge({ type, className = '' }: { type: string; className?: string }) {
   return (
-    <span className={`text-[11px] font-medium uppercase tracking-wider ${TYPE_COLORS[type] || 'text-text-muted'} ${className}`}>
+    <span className={`text-[11px] font-medium ${COLORS[type] || 'text-text-muted'} ${className}`}>
       {ASSET_TYPE_LABELS[type] || type}
     </span>
   );

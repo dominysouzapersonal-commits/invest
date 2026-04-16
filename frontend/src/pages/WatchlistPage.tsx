@@ -8,125 +8,71 @@ import ScoreGauge from '../components/common/ScoreGauge';
 import Loading from '../components/common/Loading';
 
 export default function WatchlistPage() {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ ticker: '', asset_type: 'br_stock', target_price: '', notes: '' });
 
-  const { data: items, isLoading } = useQuery({
-    queryKey: ['watchlist'],
-    queryFn: watchlistApi.list,
+  const { data: items, isLoading } = useQuery({ queryKey: ['watchlist'], queryFn: watchlistApi.list });
+  const addMut = useMutation({
+    mutationFn: () => watchlistApi.add({ ticker: form.ticker.toUpperCase(), asset_type: form.asset_type, target_price: form.target_price ? parseFloat(form.target_price) : undefined, notes: form.notes || undefined }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['watchlist'] }); setForm({ ticker: '', asset_type: 'br_stock', target_price: '', notes: '' }); setShowForm(false); },
   });
-
-  const addMutation = useMutation({
-    mutationFn: () => watchlistApi.add({
-      ticker: form.ticker.toUpperCase(),
-      asset_type: form.asset_type,
-      target_price: form.target_price ? parseFloat(form.target_price) : undefined,
-      notes: form.notes || undefined,
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
-      setForm({ ticker: '', asset_type: 'br_stock', target_price: '', notes: '' });
-      setShowForm(false);
-    },
-  });
-
-  const removeMutation = useMutation({
-    mutationFn: (id: string) => watchlistApi.remove(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['watchlist'] }),
-  });
+  const delMut = useMutation({ mutationFn: (id: string) => watchlistApi.remove(id), onSuccess: () => qc.invalidateQueries({ queryKey: ['watchlist'] }) });
 
   if (isLoading) return <Loading />;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="text-2xl font-bold text-white tracking-tight">Watchlist</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-5 py-2.5 bg-white text-black rounded-full text-[13px] font-semibold hover:bg-white/90 transition-all flex items-center gap-2"
-        >
-          <Plus size={14} /> Adicionar
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-text-primary">Watchlist</h2>
+        <button onClick={() => setShowForm(!showForm)}
+          className="px-3 py-1.5 bg-text-primary text-bg rounded-md text-xs font-medium hover:bg-white transition-colors flex items-center gap-1.5">
+          <Plus size={12} /> Adicionar
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-bg-card border border-border rounded-2xl p-6 mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <input type="text" placeholder="Ticker" value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })}
-              className="px-0 py-3 bg-transparent border-b border-border text-white placeholder-text-muted text-[15px] focus:border-text-secondary" />
-            <select value={form.asset_type} onChange={e => setForm({ ...form, asset_type: e.target.value })}
-              className="px-0 py-3 bg-transparent border-b border-border text-white text-[15px] focus:border-text-secondary">
-              <option value="br_stock" className="bg-bg-card">Ação BR</option>
-              <option value="fii" className="bg-bg-card">FII</option>
-              <option value="us_stock" className="bg-bg-card">Ação US</option>
-              <option value="us_etf" className="bg-bg-card">ETF US</option>
-              <option value="bdr" className="bg-bg-card">BDR</option>
-            </select>
-            <input type="number" placeholder="Preço alvo" value={form.target_price} onChange={e => setForm({ ...form, target_price: e.target.value })}
-              className="px-0 py-3 bg-transparent border-b border-border text-white placeholder-text-muted text-[15px] focus:border-text-secondary" />
-            <input type="text" placeholder="Notas" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
-              className="px-0 py-3 bg-transparent border-b border-border text-white placeholder-text-muted text-[15px] focus:border-text-secondary" />
-            <button onClick={() => addMutation.mutate()} disabled={!form.ticker}
-              className="py-3 bg-white text-black rounded-full text-[14px] font-semibold hover:bg-white/90 disabled:opacity-30 transition-all">
-              Salvar
-            </button>
-          </div>
+        <div className="bg-bg-card border border-border rounded-lg p-4 mb-6 grid grid-cols-5 gap-3">
+          <input type="text" placeholder="Ticker" value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })}
+            className="px-3 py-2 bg-bg border border-border rounded-md text-sm text-text-primary placeholder-text-faint focus:border-border-hover" />
+          <select value={form.asset_type} onChange={e => setForm({ ...form, asset_type: e.target.value })}
+            className="px-3 py-2 bg-bg border border-border rounded-md text-sm text-text-primary focus:border-border-hover">
+            <option value="br_stock" className="bg-bg">Ação BR</option><option value="fii" className="bg-bg">FII</option>
+            <option value="us_stock" className="bg-bg">Ação US</option><option value="us_etf" className="bg-bg">ETF US</option><option value="bdr" className="bg-bg">BDR</option>
+          </select>
+          <input type="number" placeholder="Preço alvo" value={form.target_price} onChange={e => setForm({ ...form, target_price: e.target.value })}
+            className="px-3 py-2 bg-bg border border-border rounded-md text-sm text-text-primary placeholder-text-faint focus:border-border-hover" />
+          <input type="text" placeholder="Notas" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+            className="px-3 py-2 bg-bg border border-border rounded-md text-sm text-text-primary placeholder-text-faint focus:border-border-hover" />
+          <button onClick={() => addMut.mutate()} disabled={!form.ticker}
+            className="py-2 bg-text-primary text-bg rounded-md text-sm font-medium hover:bg-white disabled:opacity-30">Salvar</button>
         </div>
       )}
 
       {items && items.length > 0 ? (
-        <div className="space-y-1">
+        <div>
           {items.map(item => {
-            const hitTarget = item.target_price && item.current_price && item.current_price <= item.target_price;
+            const hit = item.target_price && item.current_price && item.current_price <= item.target_price;
             return (
-              <div key={item.id} className="flex items-center justify-between py-4 px-4 -mx-4 rounded-xl hover:bg-white/[0.03] transition-all">
-                <div
-                  className="flex items-center gap-5 flex-1 cursor-pointer"
-                  onClick={() => navigate(`/asset/${item.ticker}`)}
-                >
-                  <span className="text-[15px] font-semibold text-white w-20">{item.ticker}</span>
+              <div key={item.id} className="flex items-center justify-between py-2.5 px-3 -mx-3 rounded-lg hover:bg-bg-hover transition-colors">
+                <div className="flex items-center gap-3 flex-1 cursor-pointer" onClick={() => navigate(`/asset/${item.ticker}`)}>
+                  <span className="text-sm font-medium text-text-primary w-16">{item.ticker}</span>
                   <Badge type={item.asset_type} />
-                  {item.notes && <span className="text-[12px] text-text-faint">{item.notes}</span>}
-                  {hitTarget && (
-                    <span className="flex items-center gap-1 text-[11px] text-gain">
-                      <AlertTriangle size={11} /> Alvo atingido
-                    </span>
-                  )}
+                  {item.notes && <span className="text-[11px] text-text-faint">{item.notes}</span>}
+                  {hit && <span className="flex items-center gap-1 text-[10px] text-gain"><AlertTriangle size={10} /> Alvo</span>}
                 </div>
-                <div className="flex items-center gap-8">
-                  {item.current_price != null && (
-                    <div className="text-right">
-                      <p className="text-[11px] text-text-muted">Atual</p>
-                      <p className="text-[15px] text-white tabular-nums">{item.current_price.toFixed(2)}</p>
-                    </div>
-                  )}
-                  {item.target_price != null && (
-                    <div className="text-right">
-                      <p className="text-[11px] text-text-muted">Alvo</p>
-                      <p className="text-[15px] text-text-secondary tabular-nums">{item.target_price.toFixed(2)}</p>
-                    </div>
-                  )}
-                  {item.current_score != null && (
-                    <ScoreGauge score={item.current_score} size="sm" showLabel={false} />
-                  )}
-                  <button
-                    onClick={() => { if (confirm('Remover?')) removeMutation.mutate(item.id); }}
-                    className="p-1.5 text-text-faint hover:text-loss transition-colors"
-                  >
-                    <X size={14} />
-                  </button>
+                <div className="flex items-center gap-6">
+                  {item.current_price != null && <div className="text-right"><p className="text-[10px] text-text-muted">Atual</p><p className="text-sm text-text-primary tabular-nums">{item.current_price.toFixed(2)}</p></div>}
+                  {item.target_price != null && <div className="text-right"><p className="text-[10px] text-text-muted">Alvo</p><p className="text-sm text-text-secondary tabular-nums">{item.target_price.toFixed(2)}</p></div>}
+                  {item.current_score != null && <ScoreGauge score={item.current_score} size="sm" showLabel={false} />}
+                  <button onClick={() => { if (confirm('Remover?')) delMut.mutate(item.id); }} className="p-1 text-text-faint hover:text-loss"><X size={12} /></button>
                 </div>
               </div>
             );
           })}
         </div>
-      ) : (
-        <div className="text-center py-24">
-          <p className="text-text-muted text-[15px]">Watchlist vazia.</p>
-        </div>
-      )}
+      ) : <p className="text-center text-xs text-text-muted py-16">Watchlist vazia.</p>}
     </div>
   );
 }

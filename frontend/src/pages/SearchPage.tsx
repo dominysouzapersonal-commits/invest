@@ -1,92 +1,76 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Search } from 'lucide-react';
 import { assetsApi } from '../services/api';
 import Badge from '../components/common/Badge';
 import Loading from '../components/common/Loading';
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [debounced, setDebounced] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query.trim()), 400);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setDebounced(query.trim()), 350);
+    return () => clearTimeout(t);
   }, [query]);
 
   const { data: results, isLoading } = useQuery({
-    queryKey: ['search', debouncedQuery],
-    queryFn: () => assetsApi.search(debouncedQuery),
-    enabled: debouncedQuery.length >= 2,
+    queryKey: ['search', debounced],
+    queryFn: () => assetsApi.search(debounced),
+    enabled: debounced.length >= 2,
   });
 
-  const popularAssets = [
-    { ticker: 'PETR4', label: 'Petrobras' },
-    { ticker: 'VALE3', label: 'Vale' },
-    { ticker: 'ITUB4', label: 'Itaú' },
-    { ticker: 'HGLG11', label: 'CSHG Log' },
-    { ticker: 'AAPL', label: 'Apple' },
-    { ticker: 'VOO', label: 'S&P 500' },
-    { ticker: 'MSFT', label: 'Microsoft' },
-    { ticker: 'AAPL34', label: 'Apple BDR' },
+  const popular = [
+    { t: 'PETR4', n: 'Petrobras' }, { t: 'VALE3', n: 'Vale' }, { t: 'ITUB4', n: 'Itaú' }, { t: 'HGLG11', n: 'CSHG Log' },
+    { t: 'AAPL', n: 'Apple' }, { t: 'VOO', n: 'S&P 500' }, { t: 'MSFT', n: 'Microsoft' }, { t: 'AAPL34', n: 'Apple BDR' },
   ];
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-white tracking-tight mb-4">Buscar ativo</h2>
+    <div className="max-w-xl mx-auto">
+      <div className="relative mb-8">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-faint" />
         <input
-          type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Ticker ou nome..."
-          autoFocus
-          className="w-full px-0 py-4 bg-transparent border-b border-border text-white placeholder-text-muted text-2xl text-center font-light focus:border-text-secondary tracking-wide"
+          type="text" value={query} onChange={e => setQuery(e.target.value)} autoFocus
+          placeholder="Buscar ticker ou nome..."
+          className="w-full pl-9 pr-3 py-2.5 bg-bg-card border border-border rounded-lg text-sm text-text-primary placeholder-text-faint focus:border-border-hover transition-colors"
         />
       </div>
 
       {isLoading && <Loading text="Buscando..." />}
 
       {results && results.length > 0 && (
-        <div className="space-y-1">
-          {results.map(asset => (
-            <div
-              key={asset.ticker}
-              className="flex items-center justify-between py-4 px-4 -mx-4 rounded-xl cursor-pointer hover:bg-white/[0.03] transition-all"
-              onClick={() => navigate(`/asset/${asset.ticker}`)}
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-[15px] font-semibold text-white w-20">{asset.ticker}</span>
-                <span className="text-[13px] text-text-secondary">{asset.name}</span>
-              </div>
+        <div>
+          {results.map(a => (
+            <div key={a.ticker} onClick={() => navigate(`/asset/${a.ticker}`)}
+              className="flex items-center justify-between py-2.5 px-3 -mx-3 rounded-lg cursor-pointer hover:bg-bg-hover transition-colors">
               <div className="flex items-center gap-3">
-                <Badge type={asset.asset_type} />
-                <span className="text-[11px] text-text-faint">{asset.exchange}</span>
+                <span className="text-sm font-medium text-text-primary w-16">{a.ticker}</span>
+                <span className="text-xs text-text-secondary">{a.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge type={a.asset_type} />
+                <span className="text-[10px] text-text-faint">{a.exchange}</span>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {results && results.length === 0 && debouncedQuery && (
-        <p className="text-center text-text-muted text-[15px] py-12">
-          Nenhum resultado para "{debouncedQuery}"
-        </p>
+      {results?.length === 0 && debounced && (
+        <p className="text-center text-xs text-text-muted py-10">Nenhum resultado para "{debounced}"</p>
       )}
 
-      {!debouncedQuery && (
+      {!debounced && (
         <div>
-          <h3 className="text-[11px] text-text-muted uppercase tracking-widest mb-6 text-center">Populares</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {popularAssets.map(a => (
-              <div
-                key={a.ticker}
-                className="py-4 text-center cursor-pointer rounded-xl border border-border hover:border-border-hover hover:bg-white/[0.02] transition-all"
-                onClick={() => navigate(`/asset/${a.ticker}`)}
-              >
-                <p className="text-[15px] font-semibold text-white">{a.ticker}</p>
-                <p className="text-[12px] text-text-muted mt-1">{a.label}</p>
+          <p className="text-xs text-text-muted mb-3">Populares</p>
+          <div className="grid grid-cols-4 gap-2">
+            {popular.map(p => (
+              <div key={p.t} onClick={() => navigate(`/asset/${p.t}`)}
+                className="py-3 text-center border border-border rounded-lg cursor-pointer hover:bg-bg-hover hover:border-border-hover transition-colors">
+                <p className="text-sm font-medium text-text-primary">{p.t}</p>
+                <p className="text-[11px] text-text-muted mt-0.5">{p.n}</p>
               </div>
             ))}
           </div>

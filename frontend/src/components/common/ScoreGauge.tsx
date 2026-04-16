@@ -1,37 +1,28 @@
-interface ScoreGaugeProps {
+interface Props {
   score: number;
   size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
 }
 
-function getScoreColor(score: number): string {
-  if (score >= 80) return '#fafafa';
-  if (score >= 60) return '#a1a1aa';
-  if (score >= 40) return '#71717a';
-  if (score >= 20) return '#ef4444';
-  return '#ef4444';
+function color(s: number) {
+  if (s >= 80) return '#3ecf8e';
+  if (s >= 60) return '#ededed';
+  if (s >= 40) return '#888888';
+  return '#f04438';
 }
 
-export default function ScoreGauge({ score, size = 'md', showLabel = true }: ScoreGaugeProps) {
-  const color = getScoreColor(score);
-  const width = size === 'lg' ? 'w-32' : size === 'md' ? 'w-24' : 'w-16';
-  const textSize = size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-2xl' : 'text-lg';
-  const barHeight = size === 'lg' ? 'h-1' : 'h-0.5';
+export default function ScoreGauge({ score, size = 'md', showLabel = true }: Props) {
+  const c = color(score);
+  const text = size === 'lg' ? 'text-2xl' : size === 'md' ? 'text-lg' : 'text-sm';
+  const w = size === 'lg' ? 'w-20' : size === 'md' ? 'w-14' : 'w-10';
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <span className={`${textSize} font-bold tracking-tight`} style={{ color }}>
-        {score.toFixed(0)}
-      </span>
-      <div className={`${width} ${barHeight} bg-border rounded-full overflow-hidden`}>
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{ width: `${score}%`, backgroundColor: color }}
-        />
+    <div className="flex flex-col items-center gap-1.5">
+      <span className={`${text} font-semibold tabular-nums`} style={{ color: c }}>{score.toFixed(0)}</span>
+      <div className={`${w} h-px bg-border rounded-full overflow-hidden`}>
+        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${score}%`, backgroundColor: c }} />
       </div>
-      {showLabel && (
-        <span className="text-[11px] text-text-muted">/100</span>
-      )}
+      {showLabel && <span className="text-[10px] text-text-faint">/100</span>}
     </div>
   );
 }
