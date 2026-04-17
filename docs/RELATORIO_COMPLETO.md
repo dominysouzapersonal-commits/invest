@@ -105,20 +105,25 @@
 
 ### Carteira Montada
 
-| # | Ativo | Categoria | Qtd | Preço | Total | Score |
-|---|---|---|---|---|---|---|
-| 1 | **INTB3** | Crescimento | 100 | R$14.39 | R$1.439,00 | 80.0 |
-| 2 | **SUZB3** | Crescimento | 20 | R$47.53 | R$950,60 | 75.8 |
-| 3 | **BBSE3** | Dividendos | 20 | R$35.01 | R$700,20 | 86.4 |
-| 4 | **ITUB4** | Dividendos | 13 | R$46.98 | R$610,74 | 77.9 |
-| 5 | **MXRF11** | FII | 68 | R$9.88 | R$671,84 | — |
-| 6 | **KNCR11** | FII | 6 | R$106.35 | R$638,10 | — |
-| 7 | **NASD11** | ETF Intl | 54 | R$18.32 | R$989,28 | — |
-| 8 | **Tesouro Selic** | Reserva | — | — | R$670,00 | — |
-| | | | | **Total** | **R$6.669,76** | |
-| | | | | **Troco** | **R$30,24** | |
+| # | Ticker na XP | Mercado | Categoria | Qtd | Preço | Total | Score |
+|---|---|---|---|---|---|---|---|
+| 1 | **INTB3** | Lote (100) | Crescimento | 100 | R$14.39 | R$1.439,00 | 80.0 |
+| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47.53 | R$1.188,25 | 75.8 |
+| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$35.01 | R$700,20 | 86.4 |
+| 4 | **ITUB4F** | Fracionário | Dividendos | 13 | R$46.98 | R$610,74 | 77.9 |
+| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9.88 | R$671,84 | — |
+| 6 | **KNCR11** | Lote (1) | FII | 6 | R$106.35 | R$638,10 | — |
+| 7 | **NASD11** | Lote (1) | ETF Intl | 54 | R$18.32 | R$989,28 | — |
+| 8 | **Tesouro Selic** | Renda Fixa | Reserva | — | — | R$670,00 | — |
+| | | | | | **Total** | **R$6.907,41** | |
 
-*Nota: INTB3 negocia em lote padrão de 100 ações na B3. SUZB3 ajustada de 25→20 para caber no budget.*
+*Como comprar na XP:*
+- **Ações com F** (SUZB3F, BBSE3F, ITUB4F): mercado fracionário, compra de 1 a 99 ações. No app da XP, basta digitar a quantidade — ele envia automaticamente para o fracionário.
+- **INTB3**: lote padrão de 100 ações (sem F).
+- **FIIs e ETFs** (MXRF11, KNCR11, NASD11): lote mínimo de 1 cota, sem fracionário.
+- **Tesouro Selic**: comprar em Renda Fixa → Tesouro Direto na XP.
+
+*Nota: O spread no fracionário é ligeiramente maior, mas para estas quantidades a diferença é desprezível (centavos).*
 
 ---
 
