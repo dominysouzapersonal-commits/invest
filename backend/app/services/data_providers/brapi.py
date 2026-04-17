@@ -122,7 +122,7 @@ async def get_quotes_all(tickers: list[str]) -> list[dict]:
 
 async def get_fundamentals(ticker: str, full: bool = False) -> dict | None:
     modules = ALL_MODULES if full else CORE_MODULES
-    data = await _get(f"quote/{ticker}", {"modules": modules})
+    data = await _get(f"quote/{ticker}", {"modules": modules, "fundamental": "true"})
     if not data:
         return None
     results = data.get("results", [])
@@ -359,7 +359,7 @@ def _parse_fundamentals(r: dict) -> dict:
         "beta": stats.get("beta"),
         "forward_pe": stats.get("forwardPE"),
         "peg_ratio": stats.get("pegRatio"),
-        "pe_ratio": stats.get("trailingPE"),
+        "pe_ratio": r.get("priceEarnings") or stats.get("trailingPE"),
         "enterprise_value": stats.get("enterpriseValue"),
         "book_value": stats.get("bookValue"),
         "shares_outstanding": stats.get("sharesOutstanding"),

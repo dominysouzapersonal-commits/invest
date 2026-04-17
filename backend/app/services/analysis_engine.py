@@ -312,6 +312,17 @@ async def get_full_asset_data_batch(tickers: list[str]) -> list[FundamentalData]
 # Builder
 # ---------------------------------------------------------------------------
 
+
+def _dte_pct(val) -> float | None:
+    """Normalize debt-to-equity: brapi returns as ratio (1.19 = 119%), convert to %."""
+    if val is None:
+        return None
+    v = float(val)
+    if v < 50:
+        return round(v * 100, 2)
+    return round(v, 2)
+
+
 def _build_fundamental_data(
     ticker: str, asset_type: str, quote: dict, fund: dict, extra: dict | None = None
 ) -> FundamentalData:
@@ -372,11 +383,11 @@ def _build_fundamental_data(
         dividend_consistency=None,
 
         net_debt_ebitda=fund.get("net_debt_ebitda"),
-        net_debt_equity=fund.get("net_debt_equity") or fund.get("debt_to_equity"),
+        net_debt_equity=fund.get("net_debt_equity") or _dte_pct(fund.get("debt_to_equity")),
         current_ratio=fund.get("current_ratio"),
         quick_ratio=fund.get("quick_ratio"),
         interest_coverage=fund.get("interest_coverage"),
-        debt_to_equity=fund.get("debt_to_equity"),
+        debt_to_equity=_dte_pct(fund.get("debt_to_equity")),
         debt_to_assets=fund.get("debt_to_assets"),
 
         avg_volume=fund.get("avg_volume") or quote.get("avg_volume"),

@@ -4,14 +4,9 @@ pydantic
 pydantic-settings
 python-dotenv
 httpx
-yfinance
 pandas
-numpy
-beautifulsoup4
-lxml
 openpyxl
 python-multipart
-cachetools
 aiofiles
 motor
 pymongo[srv]
