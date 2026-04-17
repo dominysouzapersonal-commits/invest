@@ -352,7 +352,89 @@ Score FII = (
 
 ---
 
-## 7. Regras de Alocação (para R$ 6.700)
+## 7. Análise de ETFs — Metodologia Específica
+
+ETFs são fundos passivos que replicam índices. Não têm ROE, margem, ou P/L próprios. A análise é sobre **o produto** (custo, eficiência, exposição), não sobre a "empresa".
+
+### 7.1 Critérios de Avaliação de ETFs
+
+| Critério | O que mede | Importância | Fonte |
+|---|---|---|---|
+| **Taxa de administração** | Custo anual (expense ratio) | Alta — corrói retorno composto | FMP `/etf/info` |
+| **Índice replicado** | Qual mercado/setor acompanha | Alta — define a exposição | Prospecto |
+| **Preço unitário** | Acessibilidade para o budget | Alta para portfolios pequenos | brapi / FMP |
+| **Volume/Liquidez** | Facilidade de compra/venda, spread | Média-alta | brapi |
+| **Tracking error** | Quanto desvia do índice | Média | Não disponível via API |
+| **Patrimônio (AUM)** | Tamanho do fundo | Média — fundo pequeno pode fechar | FMP `/etf/info` |
+| **Nº de holdings** | Diversificação interna | Média | FMP `/etf/info` |
+| **Composição** | Quais empresas/setores estão dentro | Informativo | FMP `/etf/holdings`, `/etf/sector-weightings` |
+| **Exposição cambial** | Se embute variação do dólar | Informativo | Estrutura do fundo |
+
+### 7.2 Comparação real dos ETFs analisados
+
+**ETFs BR (negociados na B3 em reais):**
+
+| Ticker | Índice | Preço | Volume/dia | Exposição |
+|---|---|---|---|---|
+| **NASD11** | Nasdaq 100 | R$ 18.32 | 1,3M | Tech US (Apple, Nvidia, Google) |
+| **IVVB11** | S&P 500 | R$ 395.85 | 77k | 500 maiores US |
+| **HASH11** | Crypto | R$ 49.74 | 270k | Bitcoin, Ethereum |
+| BOVA11 | Ibovespa | R$ 193.05 | 5,8M | Mercado BR |
+| SMAL11 | Small Caps BR | R$ 122.41 | 2,3M | Small caps BR |
+| DIVO11 | Dividendos BR | R$ 140.20 | 53k | Ações de dividendos BR |
+| XFIX11 | IFIX (FIIs) | R$ 13.80 | 14k | Índice de FIIs |
+
+**ETFs US (dados FMP):**
+
+| Ticker | Índice | Preço | Taxa | Holdings | Exposição |
+|---|---|---|---|---|---|
+| **VOO** | S&P 500 | $644.86 | 0.03% | 505 | 500 maiores US |
+| **VTI** | Total Market US | $346.03 | 0.03% | 3.598 | TODO o mercado US |
+| SPY | S&P 500 | $701.66 | 0.09% | 504 | = VOO mas mais caro |
+| QQQ | Nasdaq 100 | $640.47 | 0.18% | 102 | = NASD11 mas em dólar |
+| **SCHD** | Dividendos US | $30.81 | 0.06% | 104 | Blue chips de dividendos |
+| **VT** | Total World | $148.79 | 0.06% | 9.773 | MUNDO INTEIRO |
+| VXUS | Internacional ex-US | $82.63 | 0.05% | 8.602 | Mundo sem EUA |
+| VEA | Desenvolvidos ex-US | $68.63 | 0.03% | 3.873 | Europa, Japão, Austrália |
+| VWO | Emergentes | $58.21 | 0.06% | 5.942 | China, Índia, Brasil |
+
+### 7.3 Por que escolhi NASD11
+
+| Critério | NASD11 | IVVB11 | HASH11 |
+|---|---|---|---|
+| Preço | R$ 18.32 | R$ 395.85 | R$ 49.74 |
+| Cotas com R$ 1.005 | **54 cotas** | 2 cotas | 20 cotas |
+| Desperdício do budget | R$ 16 | R$ 213 | R$ 10 |
+| Volume/dia | 1,3M (excelente) | 77k (bom) | 270k (bom) |
+| Exposição | Tech global | S&P 500 amplo | Cripto (volátil) |
+| Risco | Moderado | Moderado | **Alto** (perfil incompatível) |
+
+NASD11 venceu por **acessibilidade** (54 cotas vs 2) e **liquidez** (1,3M/dia é o mais líquido dos 3). O IVVB11 é mais diversificado (500 empresas vs 100), mas a R$ 395.85 só cabem 2 cotas no budget — precisão de alocação ruim.
+
+### 7.4 Para portfolios maiores: comprar direto nos EUA
+
+Com R$ 6.700, ETFs BR fazem sentido pela praticidade. Mas com capital maior (R$ 50k+), comprar direto nos EUA via conta internacional da XP é mais vantajoso:
+
+| Fator | ETF BR (IVVB11) | ETF US direto (VOO) |
+|---|---|---|
+| Taxa do ETF | ~0.23% | 0.03% |
+| Spread cambial | Embutido (opaco) | Visível (você controla) |
+| Dividendos | Reinvestidos automaticamente | Pagos em dólares (30% IR retido) |
+| Imposto de herança | Não | Sim (estate tax US acima de $60k) |
+| Simplicidade | Compra na B3 como ação | Precisa de conta internacional |
+
+### 7.5 Regras para seleção de ETFs
+
+1. **Taxa de administração:** preferir < 0.10% (US) ou < 0.30% (BR)
+2. **Volume:** mínimo 50.000/dia para ETFs BR
+3. **Preço unitário:** deve permitir comprar pelo menos 10 cotas no budget alocado
+4. **Não duplicar exposição:** IVVB11 + VOO é redundante (ambos S&P 500)
+5. **Cripto (HASH11):** somente para perfil arrojado, máximo 5% do portfolio
+6. **ETFs de índice BR (BOVA11, SMAL11):** normalmente não faz sentido se já tem ações BR individuais na carteira
+
+---
+
+## 8. Regras de Alocação (para R$ 6.700)
 
 ### Estrutura aprovada
 
@@ -387,7 +469,7 @@ Score FII = (
 
 ---
 
-## 8. Regras de Cenário Macro
+## 9. Regras de Cenário Macro
 
 A análise deve considerar o cenário macroeconômico:
 
@@ -416,7 +498,7 @@ A análise deve considerar o cenário macroeconômico:
 
 ---
 
-## 9. Processo de Análise (Passo a Passo)
+## 10. Processo de Análise (Passo a Passo)
 
 ### Fase 1: Coleta (automatizada)
 1. Puxar cotações e fundamentalistas via brapi (batch 20)
@@ -449,7 +531,7 @@ A análise deve considerar o cenário macroeconômico:
 
 ---
 
-## 10. Red Flags — Nunca Comprar Se
+## 11. Red Flags — Nunca Comprar Se
 
 1. Prejuízo líquido nos últimos 3 anos consecutivos
 2. FCF negativo nos últimos 3 anos consecutivos
@@ -464,7 +546,7 @@ A análise deve considerar o cenário macroeconômico:
 
 ---
 
-## 11. Glossário Rápido
+## 12. Glossário Rápido
 
 | Termo | Significado |
 |---|---|
