@@ -213,14 +213,6 @@ function FireCalc({ type, selic, ipca }: { type: string; selic: number; ipca: nu
     };
   }, [expenses, withdrawal, current, monthlyContrib, returnRate, partTimeIncome, targetAge, currentAge, type, ipca]);
 
-  const labels: Record<string, string> = {
-    traditional: 'FIRE Tradicional',
-    lean: 'Lean FIRE',
-    fat: 'Fat FIRE',
-    coast: 'Coast FIRE',
-    barista: 'Barista FIRE',
-    geo: 'Geographic Arbitrage FIRE',
-  };
 
   return (
     <div>

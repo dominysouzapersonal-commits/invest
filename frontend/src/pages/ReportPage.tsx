@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Shield, Target, BarChart3, DollarSign, AlertTriangle, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendingUp, Shield, Target, BarChart3, DollarSign, AlertTriangle, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { reportApi } from '../services/api';
 import Badge from '../components/common/Badge';
 import ScoreGauge from '../components/common/ScoreGauge';
 import Loading from '../components/common/Loading';
-import type { FullReport, AssetAnalysis, CategoryRecommendation } from '../types';
+import type { FullReport, CategoryRecommendation } from '../types';
 import { useState } from 'react';
 
 function scoreColor(s: number) {
@@ -28,13 +28,7 @@ function fmtNum(v: number | null | undefined, decimals = 2) {
   return v.toFixed(decimals);
 }
 
-function fmtCap(v: number | null | undefined) {
-  if (v == null) return '—';
-  if (v >= 1e12) return `R$ ${(v / 1e12).toFixed(1)}T`;
-  if (v >= 1e9) return `R$ ${(v / 1e9).toFixed(1)}B`;
-  if (v >= 1e6) return `R$ ${(v / 1e6).toFixed(0)}M`;
-  return `R$ ${v.toLocaleString('pt-BR')}`;
-}
+
 
 function CategorySection({ cat, navigate }: { cat: CategoryRecommendation; navigate: (path: string) => void }) {
   const [expanded, setExpanded] = useState(false);
