@@ -174,6 +174,7 @@ export interface ScoringWeights {
 export const ASSET_TYPE_LABELS: Record<string, string> = {
   br_stock: 'Ação BR',
   fii: 'FII',
+  br_etf: 'ETF BR',
   us_stock: 'Ação US',
   us_etf: 'ETF US',
   bdr: 'BDR',

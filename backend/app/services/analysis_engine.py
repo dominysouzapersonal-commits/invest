@@ -6,9 +6,19 @@ from app.services.data_providers import brapi, fmp
 logger = logging.getLogger(__name__)
 
 
+BR_ETFS = {
+    "IVVB11", "NASD11", "HASH11", "BOVA11", "SMAL11", "DIVO11", "BOVV11",
+    "XFIX11", "EURP11", "ACWI11", "XINA11", "ASIA11", "GOLD11", "WRLD11",
+    "USTK11", "TECK11", "BITH11", "ETHE11", "SHOT11", "IMAB11", "IRFM11",
+    "B5P211", "FIXA11", "SPXI11", "MATB11", "FIND11",
+}
+
+
 def detect_asset_type(ticker: str) -> str:
     t = ticker.upper().replace(".SA", "")
     if ".SA" in ticker.upper() or _is_br_ticker(t):
+        if t in BR_ETFS:
+            return "br_etf"
         if t.endswith("11") and len(t) >= 6:
             return "fii"
         if t.endswith(("34", "35", "33")) and len(t) >= 5:
@@ -31,7 +41,7 @@ def _is_br_ticker(ticker: str) -> bool:
 
 async def get_full_asset_data(ticker: str) -> FundamentalData:
     asset_type = detect_asset_type(ticker)
-    is_br = asset_type in ("br_stock", "fii", "bdr")
+    is_br = asset_type in ("br_stock", "fii", "bdr", "br_etf")
 
     if is_br:
         return await _fetch_br_asset(ticker, asset_type)
@@ -55,6 +65,10 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
     # For FIIs: calculate DY from actual dividend payments
     if asset_type == "fii":
         _enrich_fii_data(quote_data, brapi_fund)
+
+    # For BR ETFs: calculate returns from historical prices
+    if asset_type == "br_etf":
+        await _enrich_etf_data(clean, quote_data, brapi_fund)
 
     # FMP enrichment for BR BDRs (they may have US tickers) — optional
     fmp_scores: dict = {}
@@ -128,6 +142,54 @@ def _enrich_fii_data(quote_data: dict, brapi_fund: dict) -> None:
 
     years_paying = len([v for v in yearly.values() if v > 0])
     quote_data["_fii_years_paying"] = years_paying
+
+
+async def _enrich_etf_data(ticker: str, quote_data: dict, brapi_fund: dict) -> None:
+    """Calculate returns for BR ETFs from historical prices."""
+    prices_1y = await brapi.get_historical(ticker, range_="1y", interval="1mo")
+    prices_6m = await brapi.get_historical(ticker, range_="6mo", interval="1mo")
+    prices_1m = await brapi.get_historical(ticker, range_="1mo", interval="1d")
+
+    def _calc_return(prices: list[dict]) -> float | None:
+        closes = [p.get("close") for p in prices if p.get("close") is not None]
+        if len(closes) >= 2 and closes[0] and closes[0] > 0:
+            return round((closes[-1] - closes[0]) / closes[0] * 100, 2)
+        return None
+
+    ret_1y = _calc_return(prices_1y)
+    ret_6m = _calc_return(prices_6m)
+    ret_1m = _calc_return(prices_1m)
+
+    if ret_1y is not None:
+        brapi_fund["revenue_growth_1y"] = ret_1y
+        brapi_fund.setdefault("_label_rg1y", "Retorno 1 ano")
+    if ret_6m is not None:
+        brapi_fund["profit_growth_1y"] = ret_6m
+        brapi_fund.setdefault("_label_pg1y", "Retorno 6 meses")
+    if ret_1m is not None:
+        brapi_fund["earnings_growth"] = ret_1m
+        brapi_fund.setdefault("_label_eg", "Retorno 1 mês")
+
+    # Use DY from dividends if ETF pays (e.g. DIVO11, XFIX11)
+    divs_data = quote_data.get("dividends_data")
+    if divs_data and isinstance(divs_data, dict):
+        from datetime import datetime
+        cash_divs = divs_data.get("cashDividends", [])
+        price = quote_data.get("price")
+        if cash_divs and price and price > 0:
+            now = datetime.now()
+            y_ago = now.replace(year=now.year - 1)
+            total = 0.0
+            for d in cash_divs:
+                try:
+                    pd_ = datetime.strptime(d.get("paymentDate", "")[:10], "%Y-%m-%d")
+                    if pd_ >= y_ago:
+                        total += float(d.get("rate", 0))
+                except (ValueError, TypeError):
+                    continue
+            if total > 0:
+                brapi_fund["dividend_yield"] = round(total / price * 100, 2)
+                quote_data["dividend_yield"] = round(total / price * 100, 2)
 
 
 async def _fetch_us_asset(ticker: str, asset_type: str) -> FundamentalData:
@@ -221,7 +283,7 @@ async def _fetch_us_asset(ticker: str, asset_type: str) -> FundamentalData:
 
 async def get_historical(ticker: str, period: str = "1y") -> list[dict]:
     asset_type = detect_asset_type(ticker)
-    is_br = asset_type in ("br_stock", "fii", "bdr")
+    is_br = asset_type in ("br_stock", "fii", "bdr", "br_etf")
 
     if is_br:
         clean = ticker.upper().replace(".SA", "")
