@@ -3,10 +3,11 @@ from typing import Optional
 
 
 class ScoringWeights(BaseModel):
-    weight_valuation: int = 25
-    weight_profitability: int = 25
-    weight_dividends: int = 20
-    weight_debt: int = 20
+    weight_valuation: int = 20
+    weight_profitability: int = 20
+    weight_fcf_quality: int = 15
+    weight_dividends: int = 15
+    weight_debt: int = 15
     weight_growth: int = 10
 
 
@@ -49,6 +50,7 @@ class AssetAnalysis(BaseModel):
     recommendation: str
     valuation_score: float
     profitability_score: float
+    fcf_quality_score: float = 50.0
     dividends_score: float
     debt_score: float
     growth_score: float

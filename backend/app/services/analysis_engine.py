@@ -49,6 +49,20 @@ async def get_full_asset_data(ticker: str) -> FundamentalData:
         return await _fetch_us_asset(ticker, asset_type)
 
 
+async def _safe_bolsai_fundamentals(ticker: str) -> dict | None:
+    try:
+        return await bolsai.get_fundamentals(ticker)
+    except Exception:
+        return None
+
+
+async def _safe_bolsai_dividends(ticker: str) -> dict | None:
+    try:
+        return await bolsai.get_dividends(ticker)
+    except Exception:
+        return None
+
+
 async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
     """BR assets: bolsai (fundamentals) + brapi (real-time quote + dividends)."""
     clean = ticker.upper().replace(".SA", "")
@@ -67,8 +81,8 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
 
     # For stocks/BDRs: bolsai fundamentals + brapi real-time + bolsai dividends
     bolsai_fund, bolsai_div, brapi_quote = await asyncio.gather(
-        bolsai.get_fundamentals(clean),
-        bolsai.get_dividends(clean),
+        _safe_bolsai_fundamentals(clean),
+        _safe_bolsai_dividends(clean),
         brapi.get_quote(clean),
         return_exceptions=True,
     )

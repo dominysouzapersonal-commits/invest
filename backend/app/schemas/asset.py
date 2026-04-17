@@ -159,6 +159,7 @@ class ScoreResult(BaseModel):
     recommendation: str
     valuation_score: float
     profitability_score: float
+    fcf_quality_score: float
     dividends_score: float
     debt_score: float
     growth_score: float

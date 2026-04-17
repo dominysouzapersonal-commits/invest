@@ -101,6 +101,7 @@ export interface ScoreResult {
   recommendation: string;
   valuation_score: number;
   profitability_score: number;
+  fcf_quality_score: number;
   dividends_score: number;
   debt_score: number;
   growth_score: number;
@@ -201,6 +202,7 @@ export interface AssetAnalysis {
   recommendation: string;
   valuation_score: number;
   profitability_score: number;
+  fcf_quality_score: number;
   dividends_score: number;
   debt_score: number;
   growth_score: number;

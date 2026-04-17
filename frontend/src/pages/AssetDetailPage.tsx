@@ -97,6 +97,7 @@ export default function AssetDetailPage() {
             {[
               { l: 'Valuation', s: score.valuation_score },
               { l: 'Rentab.', s: score.profitability_score },
+              { l: 'FCF/Lucro', s: score.fcf_quality_score },
               { l: 'Dividendos', s: score.dividends_score },
               { l: 'Dívida', s: score.debt_score },
               { l: 'Cresc.', s: score.growth_score },
@@ -179,47 +180,54 @@ export default function AssetDetailPage() {
 
       {/* Metrics grid */}
       {[
-        { title: 'Valuation', items: [
-          { l: 'P/L', v: f.pe_ratio?.toFixed(2) }, { l: 'P/VP', v: f.pb_ratio?.toFixed(2) }, { l: 'EV/EBITDA', v: f.ev_ebitda?.toFixed(2) },
-          { l: 'PSR', v: f.psr?.toFixed(2) }, { l: 'PEG', v: f.peg_ratio?.toFixed(2) }, { l: 'P/FCF', v: f.price_to_fcf?.toFixed(2) },
+        { title: 'Valuation', cols: 7, items: [
+          { l: 'P/L', v: f.pe_ratio?.toFixed(2) },
+          { l: 'P/VP', v: f.pb_ratio?.toFixed(2) },
+          { l: 'EV/EBITDA', v: f.ev_ebitda?.toFixed(2) },
+          { l: 'PSR', v: f.psr?.toFixed(2) },
+          { l: 'P/FCF', v: f.price_to_fcf?.toFixed(2) },
+          { l: 'PEG', v: f.peg_ratio?.toFixed(2) },
+          { l: 'EV/Revenue', v: f.ev_revenue?.toFixed(2) },
         ]},
-        { title: 'Rentabilidade', items: [
+        { title: 'Rentabilidade', cols: 7, items: [
           { l: 'ROE', v: f.roe?.toFixed(1), s: '%', p: f.roe != null ? f.roe > 0 : null },
           { l: 'ROA', v: f.roa?.toFixed(1), s: '%', p: f.roa != null ? f.roa > 0 : null },
           { l: 'ROIC', v: f.roic?.toFixed(1), s: '%', p: f.roic != null ? f.roic > 0 : null },
           { l: 'M. Líq.', v: f.net_margin?.toFixed(1), s: '%', p: f.net_margin != null ? f.net_margin > 0 : null },
           { l: 'M. Bruta', v: f.gross_margin?.toFixed(1), s: '%', p: f.gross_margin != null ? f.gross_margin > 0 : null },
+          { l: 'M. EBITDA', v: f.ebitda_margin?.toFixed(1), s: '%', p: f.ebitda_margin != null ? f.ebitda_margin > 0 : null },
           { l: 'M. Oper.', v: f.operating_margin?.toFixed(1), s: '%', p: f.operating_margin != null ? f.operating_margin > 0 : null },
         ]},
-        { title: 'Div. & Dívida', items: [
+        { title: 'Dividendos', cols: 2, items: [
           { l: 'DY', v: f.dividend_yield?.toFixed(2), s: '%', p: f.dividend_yield != null ? f.dividend_yield > 2 : null },
           { l: 'Payout', v: f.payout_ratio?.toFixed(0), s: '%' },
-          { l: 'Dív/EBITDA', v: f.net_debt_ebitda?.toFixed(2), p: f.net_debt_ebitda != null ? f.net_debt_ebitda < 3 : null },
+        ]},
+        { title: 'Endividamento', cols: 5, items: [
+          { l: 'Dív.Líq/EBITDA', v: f.net_debt_ebitda?.toFixed(2), p: f.net_debt_ebitda != null ? f.net_debt_ebitda < 3 : null },
+          { l: 'Dív.Líq/PL', v: f.net_debt_equity?.toFixed(2), p: f.net_debt_equity != null ? f.net_debt_equity < 1 : null },
+          { l: 'D/E', v: f.debt_to_equity?.toFixed(2), p: f.debt_to_equity != null ? f.debt_to_equity < 1.5 : null },
           { l: 'Liq. Corr.', v: f.current_ratio?.toFixed(2), p: f.current_ratio != null ? f.current_ratio > 1 : null },
           { l: 'Cob. Juros', v: f.interest_coverage?.toFixed(1), p: f.interest_coverage != null ? f.interest_coverage > 3 : null },
-          { l: 'Beta', v: f.beta?.toFixed(2) },
         ]},
-        { title: 'Crescimento', items: [
+        { title: 'Crescimento', cols: 4, items: [
+          { l: 'CAGR Rec 5a', v: f.revenue_growth_5y?.toFixed(1), s: '%', p: f.revenue_growth_5y != null ? f.revenue_growth_5y > 0 : null },
+          { l: 'CAGR Lucro 5a', v: f.profit_growth_5y?.toFixed(1), s: '%', p: f.profit_growth_5y != null ? f.profit_growth_5y > 0 : null },
           { l: 'Rec. 1a', v: f.revenue_growth_1y?.toFixed(1), s: '%', p: f.revenue_growth_1y != null ? f.revenue_growth_1y > 0 : null },
-          { l: 'Rec. 3a', v: f.revenue_growth_3y?.toFixed(1), s: '%', p: f.revenue_growth_3y != null ? f.revenue_growth_3y > 0 : null },
-          { l: 'Rec. 5a', v: f.revenue_growth_5y?.toFixed(1), s: '%', p: f.revenue_growth_5y != null ? f.revenue_growth_5y > 0 : null },
           { l: 'Lucro 1a', v: f.profit_growth_1y?.toFixed(1), s: '%', p: f.profit_growth_1y != null ? f.profit_growth_1y > 0 : null },
-          { l: 'Lucro 3a', v: f.profit_growth_3y?.toFixed(1), s: '%', p: f.profit_growth_3y != null ? f.profit_growth_3y > 0 : null },
-          { l: 'Lucro 5a', v: f.profit_growth_5y?.toFixed(1), s: '%', p: f.profit_growth_5y != null ? f.profit_growth_5y > 0 : null },
         ]},
-        { title: 'Per-share & Yields', items: [
+        { title: 'Per-share & Yields', cols: 6, items: [
           { l: 'LPA', v: f.eps?.toFixed(2) },
           { l: 'VPA', v: f.book_value_per_share?.toFixed(2) },
-          { l: 'FCF/ação', v: f.fcf_per_share?.toFixed(2) },
           { l: 'Earn. Yield', v: f.earnings_yield != null ? (f.earnings_yield * 100).toFixed(1) : undefined, s: '%', p: f.earnings_yield != null ? f.earnings_yield > 0.05 : null },
           { l: 'FCF Yield', v: f.fcf_yield != null ? (f.fcf_yield * 100).toFixed(1) : undefined, s: '%', p: f.fcf_yield != null ? f.fcf_yield > 0.05 : null },
           { l: 'Fwd P/E', v: f.forward_pe?.toFixed(1) },
+          { l: 'Beta', v: f.beta?.toFixed(2) },
         ]},
       ].map(section => (
         <div key={section.title} className="mb-6">
           <p className="text-xs text-text-muted mb-2">{section.title}</p>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-x-6">
-            {section.items.map(i => <MetricCard key={i.l} label={i.l} value={i.v} suffix={i.s || ''} positive={i.p ?? null} />)}
+          <div className={`grid grid-cols-3 gap-x-6 ${section.cols >= 7 ? 'md:grid-cols-7' : section.cols >= 6 ? 'md:grid-cols-6' : section.cols >= 5 ? 'md:grid-cols-5' : section.cols >= 4 ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
+            {section.items.map(i => <MetricCard key={i.l} label={i.l} value={i.v} suffix={'s' in i ? (i as any).s : ''} positive={i.p ?? null} />)}
           </div>
         </div>
       ))}

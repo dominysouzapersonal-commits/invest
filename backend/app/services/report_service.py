@@ -239,6 +239,7 @@ def _to_asset_analysis(fund, score_result) -> AssetAnalysis:
         recommendation=score_result.recommendation,
         valuation_score=score_result.valuation_score,
         profitability_score=score_result.profitability_score,
+        fcf_quality_score=score_result.fcf_quality_score,
         dividends_score=score_result.dividends_score,
         debt_score=score_result.debt_score,
         growth_score=score_result.growth_score,
