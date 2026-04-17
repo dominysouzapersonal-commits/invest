@@ -3,7 +3,7 @@
 > **Data:** 18 de abril de 2026
 > **Capital:** R$ 6.700
 > **Perfil:** Moderado, longo prazo, XP Investimentos
-> **Ativos analisados:** 42 ações + 37 FIIs + 20 ETFs = **99 ativos**
+> **Ativos analisados:** 144 ações (TODA a B3) + 37 FIIs + 20 ETFs = **201 ativos**
 > **Fonte dos dados:** bolsai (CVM/B3/BCB) + brapi (cotação real-time) + FMP (US)
 > **Metodologia:** `docs/METODOLOGIA_INVESTIMENTOS.md` v3 — 6 critérios quantitativos
 > **Precisão:** Dados CVM oficiais, batem com Status Invest
@@ -284,6 +284,55 @@ Score = (
 
 Fonte dos dados: bolsai `/fundamentals/{ticker}` (CVM/B3).
 Benchmarks: documentados na metodologia com pontuação de 10 a 100 por indicador.
+
+---
+
+## Análise Expandida — 144 Empresas da B3
+
+Além das 42 ações do relatório inicial, analisei **TODAS as 144 empresas ativas com dados na B3** usando o screener da bolsai. Abaixo as novas descobertas com score ≥ 65 que não estavam na análise original.
+
+### Novas descobertas relevantes
+
+| Ticker | Score | Preço | P/L | ROE | ROIC | DY? | NDE | CAGR 5a | Empresa | Veredicto |
+|---|---|---|---|---|---|---|---|---|---|---|
+| CAMB3 | 77.5 | R$10.07 | 6.2 | 22.4% | 17.4% | ~? | -0.8 | 19.6% | Cambuci (Penalty) | Small cap R$426M, caixa líquido. **Risco: ilíquida** |
+| BNBR3 | 76.5 | R$118.70 | 3.8 | 19.2% | 19.8% | ~? | 1.4 | 20.7% | Banco do Nordeste | P/L 3.8 absurdo. **Risco: estatal federal** |
+| RIAA3 | 75.8 | R$10.65 | 3.6 | 27.6% | 12.6% | ~? | 0.1 | 10.9% | Guararapes/Riachuelo | P/L 3.6, ROE 27.6%. **Risco: varejo cíclico** |
+| SAPR11 | 72.6 | R$41.38 | 6.0 | 16.8% | 9.2% | ~8.5% | 0.7 | 8.5% | Sanepar | Saneamento PR, P/L 6. **Risco: estatal estadual** |
+| GMAT3 | 72.2 | R$4.60 | 5.8 | 17.6% | 12.5% | ~? | 0.4 | 25.4% | Grupo Mateus | Supermercados, CAGR 25%. **Preço acessível** |
+| CURY3 | 71.0 | R$34.21 | 10.8 | 70.6% | 87.5% | ~? | -0.2 | 36.4% | Cury Construtora | ROE 70.6%(!). **Risco: construção + SELIC alta** |
+| GRND3 | 71.4 | R$4.71 | 6.6 | 20.4% | 8.1% | ~? | -2.7 | 6.4% | Grendene (Havaianas) | Caixa líquido R$2.7B(!), NM 24.9%. **Crescimento fraco** |
+| CEAB3 | 71.6 | R$13.05 | 6.8 | 15.8% | 17.5% | ~? | -0.1 | 14.3% | C&A Modas | Turnaround, ROIC 17.5%. **Risco: varejo** |
+| AZZA3 | 70.8 | R$22.22 | 5.0 | 11.4% | 7.0% | ~? | 1.2 | 49.3% | Azzas (Arezzo+Soma) | CAGR 49.3%, P/VP 0.6. **Risco: integração pós-fusão** |
+| BRFS3 | 65.9 | R$17.95 | 8.6 | 24.5% | 15.6% | ~? | 1.4 | 10.5% | BRF (Sadia/Perdigão) | Turnaround ROE 24.5%. **Risco: commodity + histórico ruim** |
+| SANB11 | 73.4 | R$31.45 | 9.2 | 10.2% | 10.5% | ~8.6% | -1.2 | 20.9% | Santander Brasil | Banco sólido, DY ~8.6%. **Risco: controlador estrangeiro decide** |
+
+### Alguma dessas supera os escolhidos?
+
+**GMAT3 (Grupo Mateus)** é a mais interessante. P/L 5.8, CAGR 25.4%, ROIC 12.5%, quase sem dívida. É um supermercado nordestino em expansão acelerada — o "Atacadão do Norte". Preço R$4.60 é muito acessível. Mas margem líquida de apenas 4.8% é apertada e varejo de alimentos é competitivo. Não supera INTB3 (margem 10.8%, caixa líquido, DY 7.8%) para a fatia de crescimento.
+
+**GRND3 (Grendene)** tem caixa líquido de R$2.7 bilhões (!!!) e margem 24.9%. Mas CAGR de apenas 6.4% — empresa madura que não cresce. Não supera SUZB3 (CAGR 10.5%, ROE 30.6%) para crescimento nem BBSE3 (DY 13%) para dividendos.
+
+**CURY3** tem ROE de 70.6% e ROIC de 87.5% — números espetaculares. Mas é construção civil com SELIC 14.75%. O DY de ~15% pode ser extraordinário. Quando SELIC cair, pode ser oportunidade. **Na watchlist.**
+
+**BNBR3** (Banco do Nordeste) tem P/L 3.8 e ROIC 19.8% — absurdamente barato. Mas é **estatal federal** como PETR4 e BBAS3. Descartado por governança.
+
+**RIAA3** (Riachuelo) P/L 3.6, ROE 27.6% — parece incrível. Mas é **varejo** de moda, setor cíclico e competitivo. Com SELIC 14.75%, consumo cai. Risco alto demais para perfil moderado.
+
+### Conclusão da análise expandida
+
+**A carteira permanece inalterada.** Das 144 empresas da B3, nenhuma nova descoberta supera os 4 escolhidos (INTB3, SUZB3, BBSE3, ITUB4) considerando o perfil moderado e o cenário de SELIC alta. As novas com score alto são:
+- Estatais (BNBR3, SAPR11) → governança
+- Construção (CURY3, DIRR3) → SELIC alta
+- Varejo cíclico (RIAA3, CEAB3, AZZA3) → consumo fraco
+- Small caps ilíquidas (CAMB3, BALM4) → risco de liquidez
+
+**Watchlist atualizada:**
+1. **CURY3** — quando SELIC cair abaixo de 10%
+2. **GMAT3** — acompanhar evolução de margens
+3. **RECV3** — quando petróleo estabilizar
+4. **WEGE3** — quando P/L cair abaixo de 20
+5. **GRND3** — se começar a crescer de novo
 
 ---
 
