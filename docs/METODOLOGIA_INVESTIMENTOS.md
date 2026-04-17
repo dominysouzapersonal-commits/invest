@@ -76,7 +76,7 @@ Todos os indicadores abaixo são obtidos da **bolsai** (fonte CVM/B3) para açõ
 | PSR | < 1.5 | 1.5-2 | 2-3 | 3-5 | > 5 | `p_sr` |
 
 **Regras:**
-- P/L negativo = prejuízo = 5 pts (penalidade máxima)
+- P/L negativo = prejuízo = **5 pts** por padrão. **Exceção (turnaround):** se Dív.Líq/EBITDA < 2 OU ROIC > 8%, sobe para **20 pts** — reconhece empresas em prejuízo temporário com balanço sólido (melhoria baseada em revisão Graham)
 - EV/EBITDA é mais confiável que P/L porque inclui dívida e ignora estrutura de capital
 - PSR é útil para empresas em prejuízo onde P/L não funciona
 
@@ -105,9 +105,10 @@ Todos os indicadores abaixo são obtidos da **bolsai** (fonte CVM/B3) para açõ
 | FCF Yield | > 10% | 5-10% | 2-5% | 0-2% | < 0% | Calculado: FCF / Market Cap |
 | Earnings Yield | > 12% | 8-12% | 5-8% | 3-5% | < 3% | Calculado: 1 / P/L |
 
-**Nota:** A bolsai não retorna FCF Yield e Earnings Yield diretamente. Calcular:
-- FCF Yield = não disponível via bolsai (seria necessário DFC raw). Quando ausente, assume 50 pts (neutro).
-- Earnings Yield = inverso do P/L. Se P/L = 10, EY = 10%. Se P/L = 5, EY = 20%.
+**Cálculo automático no scoring:**
+- **Earnings Yield** = 100 / P/L. Calculado automaticamente quando P/L > 0. Ex: P/L 5 → EY 20% (100 pts). P/L 20 → EY 5% (55 pts). Greenblatt usa EY como um dos 2 fatores da Magic Formula.
+- **FCF Yield** = não disponível via bolsai (necessitaria DFC raw). Quando ausente, o scoring usa apenas EY.
+- **Impacto:** Empresas baratas (P/L baixo) agora ganham pontos reais neste critério em vez de 50 neutro. Ex: SUZB3 P/L 4.5 → EY 22.3% → 100 pts. WEGE3 P/L 31.9 → EY 3.1% → 30 pts.
 
 **Regra:** Se a empresa reporta lucro mas FCF é negativo por 3+ anos, é red flag. Lucro contábil pode ser manipulado; caixa não.
 
@@ -155,12 +156,14 @@ Todos os indicadores abaixo são obtidos da **bolsai** (fonte CVM/B3) para açõ
 
 ### Bônus/Penalidade: Piotroski F-Score e Altman Z-Score
 
+Usados como **tie-breaker** (desempate), não como fator principal. Piotroski funciona melhor para value stocks; Altman para manufatura/indústria — ambos menos precisos para bancos e tech.
+
 | Score | Bônus | Fonte |
 |---|---|---|
-| Piotroski F-Score ≥ 7 | **+4 pontos** | FMP `/financial-scores` |
-| Piotroski F-Score ≤ 3 | **-3 pontos** | FMP |
-| Altman Z-Score > 2.99 | **+3 pontos** | FMP |
-| Altman Z-Score < 1.81 | **-4 pontos** | FMP |
+| Piotroski F-Score ≥ 7 | **+2 pontos** | FMP `/financial-scores` |
+| Piotroski F-Score ≤ 3 | **-2 pontos** | FMP |
+| Altman Z-Score > 2.99 | **+2 pontos** | FMP |
+| Altman Z-Score < 1.81 | **-3 pontos** | FMP |
 
 ---
 

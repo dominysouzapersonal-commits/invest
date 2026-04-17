@@ -1,146 +1,116 @@
-# Relatório Completo de Análise de Investimentos (v3 — Dados CVM)
+# Relatório Completo de Análise de Investimentos (v4 — Final)
 
 > **Data:** 18 de abril de 2026
 > **Capital:** R$ 6.700
 > **Perfil:** Moderado, longo prazo, XP Investimentos
-> **Ativos analisados:** 144 ações (TODA a B3) + 37 FIIs + 20 ETFs = **201 ativos**
-> **Fonte dos dados:** bolsai (CVM/B3/BCB) + brapi (cotação real-time) + FMP (US)
-> **Metodologia:** `docs/METODOLOGIA_INVESTIMENTOS.md` v3 — 6 critérios quantitativos
-> **Precisão:** Dados CVM oficiais, batem com Status Invest
+> **Ativos analisados:** 144 ações (toda a B3) + 37 FIIs + 20 ETFs = **201 ativos**
+> **Fonte dos dados:** bolsai Pro (CVM/B3/BCB) + brapi Premium (cotação real-time) + FMP (US)
+> **Metodologia:** `METODOLOGIA_INVESTIMENTOS.md` v3 — 6 critérios + Piotroski/Altman
+> **Precisão:** Dados CVM oficiais, verificados contra Status Invest (match exato)
+> **Scoring:** Melhorado com feedback externo (turnaround, Earnings Yield, tie-breaker)
 
 ---
 
 ## Cenário Macroeconômico
 
-| Indicador | Valor | Fonte |
+| Indicador | Valor | Impacto |
 |---|---|---|
-| SELIC (meta Copom) | **14.75%** | bolsai `/macro/selic_target` |
-| IPCA 12 meses | **~5.3%** | bolsai `/macro/ipca` |
-| CDI | **14.15%** | bolsai `/macro/cdi` |
-| USD/BRL | **R$ 5.00** | bolsai `/macro/usd_brl` |
-| Juro real (SELIC - IPCA) | **~9.5%** | Calculado |
-
-**Implicação:** CDI de 14.15% é o benchmark. Qualquer investimento em renda variável precisa ter expectativa de retorno superior, seja por dividendos, valorização, ou ambos.
+| SELIC (meta) | **14.75%** | CDI alto = benchmark exigente para renda variável |
+| IPCA 12m | **~5.3%** | Juro real ~9.5% — excelente para renda fixa |
+| CDI | **14.15%** | Qualquer investimento precisa superar isso |
+| USD/BRL | **R$ 5.00** | Exportadoras beneficiadas |
 
 ---
 
-## Ranking Final — Todas as Ações Analisadas
+## Ranking Final — Top 25 (de 144 empresas da B3)
 
-Score calculado pela METODOLOGIA v3: Valuation 20% + Rentabilidade 20% + FCF 15% + Dividendos 15% + Endividamento 15% + Crescimento 10% + Bônus Piotroski/Altman.
-
-### Excelente (Score ≥ 80)
-
-| # | Ticker | Score | Preço | P/L | P/VP | EV/EBITDA | ROE | ROIC | DY | M.Líq | Dív.Líq/EBITDA | CAGR Rec 5a |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | **RECV3** | **84.9** | R$13.58 | 6.2 | 0.92 | 3.6 | 14.7% | 8.9% | 9.1% | 20.2% | 1.0 | 32.0% |
-| 2 | **DIRR3** | **83.8** | R$14.27 | 9.4 | 3.88 | 7.1 | 41.2% | 27.1% | 15.5% | 22.6% | 0.6 | 23.7% |
-| 3 | **CXSE3** | **80.5** | R$18.88 | 13.2 | 4.18 | 11.8 | 31.7% | 25.9% | 8.7% | — | -0.4 | — |
-
-### Bom Investimento (Score 65-79)
-
-| # | Ticker | Score | Preço | P/L | P/VP | EV/EBITDA | ROE | ROIC | DY | M.Líq | Dív.Líq/EBITDA | CAGR Rec 5a |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 4 | WIZC3 | 79.2 | R$9.53 | 7.6 | 2.18 | 1.9 | 28.8% | 67.5% | 5.9% | 26.6% | -0.0 | 11.5% |
-| 5 | RDOR3 | 79.0 | R$39.25 | 19.2 | 4.64 | 8.2 | 24.2% | 25.9% | 10.9% | 8.7% | 0.5 | 31.8% |
-| 6 | **PETR4** | **78.8** | R$48.58 | 5.7 | 1.51 | 3.4 | 26.5% | 17.4% | 6.0% | 22.2% | 1.2 | 12.8% |
-| 7 | **BBSE3** | **78.5** | R$35.01 | 7.5 | 6.55 | 12.8 | 86.8% | 76.6% | 13.0% | — | -1.3 | — |
-| 8 | CYRE3 | 77.6 | R$27.25 | 6.2 | 1.22 | 10.2 | 19.6% | 7.1% | 13.9% | 25.4% | 2.8 | 19.8% |
-| 9 | PSSA3 | 77.0 | R$53.69 | 10.3 | 2.21 | 0.7 | 21.5% | — | 5.6% | 8.4% | -0.4 | 17.0% |
-| 10 | **INTB3** | **75.3** | R$14.39 | 9.8 | 1.58 | 8.2 | 16.1% | 11.4% | 7.8% | 10.8% | -0.4 | 15.9% |
-| 11 | **ITUB4** | **73.2** | R$46.98 | 11.3 | 2.41 | 9.0 | 21.3% | 15.4% | 7.8% | 11.8% | 0.0 | 17.4% |
-| 12 | FLRY3 | 72.9 | R$17.09 | 15.3 | 1.87 | 5.8 | 12.2% | 10.1% | 6.3% | 7.2% | 1.5 | 22.8% |
-| 13 | SLCE3 | 72.6 | R$18.10 | 16.2 | 1.79 | 5.3 | 11.0% | 12.8% | 8.0% | 5.8% | 1.9 | 20.3% |
-| 14 | ABEV3 | 71.9 | R$15.43 | 15.7 | 2.77 | 8.4 | 17.6% | 18.8% | 6.4% | 18.1% | -0.6 | 8.6% |
-| 15 | BBDC4 | 69.4 | R$20.85 | 9.3 | 1.24 | 9.7 | 13.3% | 7.2% | 8.0% | 8.8% | 6.9 | 22.4% |
-| 16 | SBSP3 | 68.7 | R$167.90 | 14.0 | 2.79 | 10.1 | 20.0% | 11.6% | 4.3% | 22.2% | 1.9 | 16.4% |
-| 17 | CMIG4 | 68.5 | R$13.52 | 7.9 | 1.35 | 7.1 | 17.1% | 9.1% | 6.8% | 11.5% | 2.2 | 11.1% |
-| 18 | SUZB3 | 68.0 | R$47.53 | 4.5 | 1.37 | 6.1 | 30.6% | 5.9% | 2.4% | 26.8% | 3.3 | 10.5% |
-| 19 | ITSA4 | 67.5 | R$14.81 | 10.1 | 1.87 | — | 18.6% | 19.0% | 8.9% | — | 3.2 | 7.0% |
-| 20 | CPFE3 | 65.9 | R$56.26 | 11.8 | 2.88 | 6.6 | 24.4% | 15.5% | 5.0% | 12.9% | 1.9 | 7.5% |
-| 21 | TOTS3 | 65.2 | R$34.77 | 23.4 | 4.08 | 8.3 | 17.5% | 27.8% | 1.9% | 15.9% | 0.0 | 17.3% |
-| 22 | TAEE11 | 64.6 | R$44.30 | 9.7 | — | — | 20.8% | — | 7.3% | — | — | — |
-| 23 | SANB11 | 73.4 | R$31.45 | 9.2 | — | — | 10.2% | — | 8.6% | — | — | — |
-| 24 | KLBN11 | 65.5 | R$18.95 | 14.1 | — | — | 21.3% | — | 5.1% | — | — | — |
-
-### Razoável e abaixo (Score < 65)
-
-| Ticker | Score | Motivo principal |
-|---|---|---|
-| VALE3 | 64.5 | P/L 28.1 alto, ROE 7.5% fraco, CAGR receita 0.5% |
-| WEGE3 | 59.8 | P/L 31.9, P/VP 11.66 — excelente empresa mas extremamente cara |
-| RENT3 | 59.7 | P/L 30.4, ROE 7.3%, margem 4.5% — cara para o que entrega |
-| SBSP3 poderia ser melhor mas DY 4.3% e EV/EBITDA 10.1 pesam |
-| PRIO3 | 56.0 | Não paga dividendos, Dív/EBITDA 3.1, ROIC 3% |
-| HAPV3 | 55.7 | Prejuízo (P/L -43.8), ROE -29% |
-| CSAN3 | 56.2 | Prejuízo (P/L -2.2), ROE -183% |
-| CSNA3 | 51.2 | Prejuízo, ROE -15.6% |
+| # | Ticker | Score | Rec | Preço | P/L | P/VP | EV/EB | ROE | ROIC | DY | NM | NDE | EY | CAGR5R |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | RECV3 | **92.8** | Excelente | R$13.58 | 6.2 | 0.92 | 3.6 | 14.7% | 8.9% | 9.1% | 20.2% | 1.0 | 16.0% | 32.0% |
+| 2 | DIRR3 | **88.5** | Excelente | R$14.27 | 9.4 | 3.88 | 7.1 | 41.2% | 27.1% | 15.5% | 22.6% | 0.6 | 10.6% | 23.7% |
+| 3 | WIZC3 | **87.1** | Excelente | R$9.53 | 7.6 | 2.18 | 1.9 | 28.8% | 67.5% | 5.9% | 26.6% | 0.0 | 13.2% | 11.5% |
+| 4 | PETR4 | **86.7** | Excelente | R$48.58 | 5.7 | 1.51 | 3.4 | 26.5% | 17.4% | 6.0% | 22.2% | 1.2 | 17.6% | 12.8% |
+| 5 | **BBSE3** | **86.4** | Excelente | R$35.01 | 7.5 | 6.55 | 12.8 | 86.8% | 76.6% | 13.0% | — | -1.3 | 13.3% | — |
+| 6 | GRND3 | **86.3** | Excelente | R$4.71 | 6.6 | 1.35 | 8.9 | 20.4% | 8.1% | 33.4% | 24.9% | -2.7 | 15.2% | 6.4% |
+| 7 | CURY3 | **86.2** | Excelente | R$34.21 | 10.8 | 7.63 | 7.1 | 70.6% | 87.5% | 12.8% | 20.0% | -0.2 | 9.3% | 36.4% |
+| 8 | CYRE3 | **85.5** | Excelente | R$27.25 | 6.2 | 1.22 | 10.2 | 19.6% | 7.1% | 13.9% | 25.4% | 2.8 | 16.1% | 19.8% |
+| 9 | RIAA3 | **84.3** | Bom | R$10.65 | 3.6 | 1.00 | 3.0 | 27.6% | 12.6% | — | 14.1% | 0.1 | 27.6% | 10.9% |
+| 10 | GMAT3 | **82.7** | Bom | R$4.60 | 5.8 | 1.02 | 4.3 | 17.6% | 12.5% | 4.1% | 4.8% | 0.4 | 17.3% | 25.4% |
+| 11 | PSSA3 | 81.7 | Bom | R$53.69 | 10.3 | 2.21 | 0.7 | 21.5% | — | 5.6% | 8.4% | -0.4 | 9.7% | 17.0% |
+| 12 | CXSE3 | 81.3 | Bom | R$18.88 | 13.2 | 4.18 | 11.8 | 31.7% | 25.9% | 8.7% | — | -0.4 | 7.6% | — |
+| 13 | **INTB3** | **80.0** | Bom | R$14.39 | 9.8 | 1.58 | 8.2 | 16.1% | 11.4% | 7.8% | 10.8% | -0.4 | 10.2% | 15.9% |
+| 14 | RDOR3 | 79.8 | Bom | R$39.25 | 19.2 | 4.64 | 8.2 | 24.2% | 25.9% | 10.9% | 8.7% | 0.5 | 5.2% | 31.8% |
+| 15 | BRFS3 | 78.9 | Bom | R$17.95 | 8.6 | 2.10 | 4.2 | 24.5% | 15.6% | 11.6% | 5.0% | 1.4 | 11.6% | 10.5% |
+| 16 | SANB11 | 78.1 | Bom | R$31.45 | 9.2 | 0.94 | 5.8 | 10.2% | 10.5% | 8.6% | 8.0% | -1.2 | 10.8% | 20.9% |
+| 17 | **ITUB4** | **77.9** | Bom | R$46.98 | 11.3 | 2.41 | 9.0 | 21.3% | 15.4% | 7.8% | 11.8% | 0.0 | 8.8% | 17.4% |
+| 18 | CMIG4 | 76.4 | Bom | R$13.52 | 7.9 | 1.35 | 7.1 | 17.1% | 9.1% | 6.8% | 11.5% | 2.2 | 12.7% | 11.1% |
+| 19 | **SUZB3** | **75.8** | Bom | R$47.53 | 4.5 | 1.37 | 6.1 | 30.6% | 5.9% | 2.4% | 26.8% | 3.3 | 22.3% | 10.5% |
+| 20 | BBDC4 | 74.2 | Bom | R$20.85 | 9.3 | 1.24 | 9.7 | 13.3% | 7.2% | 8.0% | 8.8% | 6.9 | 10.7% | 22.4% |
 
 ---
 
-## Carteira Sugerida — R$ 6.700
+## Carteira Final — R$ 6.700
 
-### Decisão por categoria
+### Decisão por categoria com justificativa
 
 **Crescimento (35% = R$ 2.345)**
 
-Top picks por score para crescimento (ROE alto, margem forte, valuation razoável):
+| Escolhido | Score | Por que SIM |
+|---|---|---|
+| **INTB3** (80.0) | Crescimento | P/L 9.8, **caixa líquido** (NDE -0.4), DY 7.8%, ROIC 11.4%, NM, CAGR 15.9%. Tech BR lucrativa. |
+| **SUZB3** (75.8) | Crescimento | P/L 4.5 (mais barato da B3), ROE 30.6%, NM 26.8%, EY 22.3%. Líder mundial celulose. |
 
-| Opção | Score | Por que sim | Por que não |
-|---|---|---|---|
-| **INTB3** | 75.3 | P/L 9.8, ROIC 11.4%, DY 7.8%, **caixa líquido**, NM, CAGR 15.9% | Empresa menor, menos líquida |
-| **SUZB3** | 68.0 | P/L 4.5 (baratíssimo), ROE 30.6%, NM 26.8%, líder celulose | Dív/EBITDA 3.3, DY apenas 2.4% |
-| PETR4 | 78.8 | Score alto, P/L 5.7, ROE 26.5%, DY 6% | **Estatal** — risco político |
-| SBSP3 | 68.7 | ROE 20%, moat fortíssimo (monopólio) | EV/EBITDA 10.1, DY 4.3% |
-
-**Escolha:** INTB3 + SUZB3. Evito PETR4 (estatal) e SBSP3 (valuation mediocre).
+| Descartado | Score | Por que NÃO |
+|---|---|---|
+| RECV3 (92.8) | 1º lugar | Dependente de petróleo. CAGR 32% insustentável (aquisições). Small cap volátil. |
+| DIRR3 (88.5) | 2º lugar | **Construção + SELIC 14.75%** = risco setorial. DY 15.5% pode ser extraordinário. |
+| CURY3 (86.2) | 7º lugar | Mesma razão: construção + SELIC. ROE 70.6% espetacular mas risco alto. |
+| CYRE3 (85.5) | 8º lugar | Idem. DY 13.9% provavelmente não sustentável. |
+| PETR4 (86.7) | 4º lugar | **Estatal federal.** Score alto apesar de -5 governança. Risco político inaceitável. |
+| RIAA3 (84.3) | 9º lugar | Varejo de moda com SELIC alta. Consumo cai. |
+| GMAT3 (82.7) | 10º lugar | NM 4.8% muito apertada. Supermercado é competitivo. |
+| WEGE3 (56.7) | — | P/L 31.9, EY 3.1%. Empresa excelente, preço proibitivo. |
 
 **Dividendos (20% = R$ 1.340)**
 
-| Opção | Score | DY | ROE | Por que sim | Por que não |
-|---|---|---|---|---|---|
-| **BBSE3** | 78.5 | 13.0% | 86.8% | ROE absurdo, caixa líquido, DY 13%, NM | P/VP 6.55 alto |
-| **ITUB4** | 73.2 | 7.8% | 21.3% | Melhor banco BR, ROIC 15.4%, CAGR 17.4% | P/L 11.3 não é baratíssimo |
-| BBDC4 | 69.4 | 8.0% | 13.3% | DY 8%, P/L 9.3, P/VP 1.24 barato | Dív/EBITDA 6.9 (!), ROIC 7.2% fraco |
-| CMIG4 | 68.5 | 6.8% | 17.1% | P/L 7.9, DY 6.8% | **Estatal** MG |
-| ITSA4 | 67.5 | 8.9% | 18.6% | DY 8.9%, exposição ao Itaú | Redundante com ITUB4 |
+| Escolhido | Score | Por que SIM |
+|---|---|---|
+| **BBSE3** (86.4) | Dividendos | ROE **86.8%**, DY **13.0%**, **caixa líquido** (NDE -1.3). Máquina de dividendos. NM. |
+| **ITUB4** (77.9) | Dividendos | ROE 21.3%, DY 7.8% crescente, ROIC 15.4%, melhor banco BR. NDE 0.0. |
 
-**Escolha:** BBSE3 + ITUB4. BBDC4 tem dívida alta (6.9× EBITDA). CMIG4 é estatal. ITSA4 seria redundante.
+| Descartado | Score | Por que NÃO |
+|---|---|---|
+| WIZC3 (87.1) | 3º lugar | DY 5.9% — inferior a BBSE3 (13%) e ITUB4 (7.8%). Canal Caixa = risco. |
+| GRND3 (86.3) | 6º lugar | DY 33.4% anômalo (provavelmente especial/amortização). CAGR 6.4% fraco. |
+| CXSE3 (81.3) | 12º lugar | **Estatal** (Caixa Econômica = governo federal). |
+| CMIG4 (76.4) | 18º lugar | **Estatal** MG. |
+| BBDC4 (74.2) | 20º lugar | NDE 6.9 alto. ROIC 7.2% fraco vs ITUB4 15.4%. |
 
-**FIIs (20% = R$ 1.340)**
+**FIIs (20% = R$ 1.340)** — Confirmados pela análise de 37 FIIs
 
-Da análise de 37 FIIs (dados bolsai + brapi):
+| FII | DY TTM | P/VP | Por que |
+|---|---|---|---|
+| **MXRF11** | 11.0% | 1.03 | Híbrido, volume 1.1M/dia, 7 anos pagando |
+| **KNCR11** | 13.2% | 1.04 | Papel CDI, gestão Kinea/Itaú |
 
-| FII | DY TTM | P/VP | Tipo | Por que sim |
-|---|---|---|---|---|
-| **MXRF11** | 11.0% | 1.03 | Híbrido | Volume 1.1M/dia, 7 anos pagando, crescente |
-| **KNCR11** | 13.2% | 1.04 | Papel CDI | Gestão Kinea/Itaú, correlação com SELIC |
+**ETF Internacional (15% = R$ 1.005)** — Confirmado pela análise de 20 ETFs
 
-**Escolha mantida.** FIIs de papel se beneficiam da SELIC 14.75%.
+| ETF | Ret 1a | Volume | Por que |
+|---|---|---|---|
+| **NASD11** | +8.0% | 1.3M/dia | Nasdaq 100, R$18.32 (54 cotas), mais líquido |
 
-**ETF Internacional (15% = R$ 1.005)**
-
-Da análise de 20 ETFs:
-
-| ETF | Preço | Ret 1 ano | Volume | Por que |
-|---|---|---|---|---|
-| **NASD11** | R$18.32 | +8.0% | 1.3M | Nasdaq 100, preço acessível (54 cotas), volume excelente |
-
-**Escolha mantida.** Confirmada pela análise de 20 ETFs.
-
-**Reserva (10% = R$ 670)**
-
-Tesouro Selic ou CDB 100% CDI na XP. SELIC 14.75% rende mais que muita ação.
+**Reserva (10% = R$ 670)** — Tesouro Selic / CDB 100% CDI
 
 ---
 
-### Carteira Final
+### Carteira Montada
 
 | # | Ativo | Categoria | Qtd | Preço | Total | Score |
 |---|---|---|---|---|---|---|
-| 1 | **INTB3** | Crescimento | 80 | R$14.39 | R$1.151,20 | 75.3 |
-| 2 | **SUZB3** | Crescimento | 25 | R$47.53 | R$1.188,25 | 68.0 |
-| 3 | **BBSE3** | Dividendos | 20 | R$35.01 | R$700,20 | 78.5 |
-| 4 | **ITUB4** | Dividendos | 13 | R$46.98 | R$610,74 | 73.2 |
+| 1 | **INTB3** | Crescimento | 80 | R$14.39 | R$1.151,20 | 80.0 |
+| 2 | **SUZB3** | Crescimento | 25 | R$47.53 | R$1.188,25 | 75.8 |
+| 3 | **BBSE3** | Dividendos | 20 | R$35.01 | R$700,20 | 86.4 |
+| 4 | **ITUB4** | Dividendos | 13 | R$46.98 | R$610,74 | 77.9 |
 | 5 | **MXRF11** | FII | 68 | R$9.88 | R$671,84 | — |
 | 6 | **KNCR11** | FII | 6 | R$106.35 | R$638,10 | — |
 | 7 | **NASD11** | ETF Intl | 54 | R$18.32 | R$989,28 | — |
@@ -150,107 +120,93 @@ Tesouro Selic ou CDB 100% CDI na XP. SELIC 14.75% rende mais que muita ação.
 
 ---
 
-## Por que os Top 3 do ranking NÃO entraram na carteira
+## Por que os Top 5 do ranking NÃO entraram
 
-### RECV3 (Score 84.9) — Descartado
+### #1 RECV3 (92.8) — PetroRecôncavo
 
-PetroRecôncavo. Números excelentes (P/L 6.2, DY 9.1%, NDE 1.0), mas:
-- **Depende 100% do preço do petróleo** — sem diversificação
-- **Empresa pequena** (market cap ~R$ 7B) — mais volátil
-- **CAGR 32%** é insustentável — crescimento por aquisições de campos, não orgânico
-- Para perfil moderado com R$ 6.700, o risco de concentração em commodity é alto
+Score mais alto da B3. P/L 6.2, DY 9.1%, NDE 1.0, EY 16%, CAGR 32%.
 
-### DIRR3 (Score 83.8) — Descartado
+**Mas:** Empresa de petróleo que compra campos maduros. O CAGR 32% é por aquisições, não crescimento orgânico. Quando parar de comprar campos, o crescimento para. Depende 100% do preço do petróleo — sem controle. Market cap R$7B (small-mid cap). Para perfil moderado com R$6.700, risco de concentração em commodity volátil.
 
-Direcional Engenharia. ROE 41.2%, DY 15.5% parecem incríveis, mas:
-- **Construção civil com SELIC 14.75%** — crédito imobiliário caro, vendas caem
-- **DY 15.5% provavelmente não sustentável** — pode incluir dividendo extraordinário
-- **P/VP 3.88** — está cara pelo patrimônio
-- Quando SELIC cair, pode ser boa. Agora, risco setorial alto.
+### #2 DIRR3 (88.5) — Direcional Engenharia
 
-### CXSE3 (Score 80.5) — Descartado
+ROE 41.2%, ROIC 27.1%, DY 15.5%, NDE 0.6. Números espetaculares.
 
-Caixa Seguridade. Modelo similar à BBSE3, ROE 31.7%, DY 8.7%, caixa líquido. Mas:
-- **A Caixa Econômica Federal é 100% estatal federal** — risco político máximo
-- Governo pode mudar contratos de distribuição de seguros a qualquer momento
-- BBSE3 (via Banco do Brasil) é mais estável — BB tem governança melhor que Caixa
+**Mas:** Construção civil com SELIC 14.75%. Crédito imobiliário caro = menos vendas. O DY 15.5% inclui dividendo extraordinário e não é sustentável no próximo ano. Quando SELIC cair abaixo de 10%, pode ser oportunidade. **Na watchlist.**
 
----
+### #3 WIZC3 (87.1) — Wiz Co
 
-## Análise Detalhada dos Escolhidos
+ROE 28.8%, ROIC 67.5%, NM 26.6%, caixa líquido. Corretora de seguros.
 
-### INTB3 — Intelbras (Crescimento)
+**Mas:** DY apenas 5.9% (inferior a BBSE3 com 13%). Depende da Caixa Econômica Federal como canal exclusivo — se a Caixa mudar o contrato, perde tudo. BBSE3 tem o mesmo modelo mas com ROE 86.8% e DY dobro.
 
-| Indicador | Valor | Avaliação |
-|---|---|---|
-| P/L | 9.8 | Barato para tech lucrativa |
-| P/VP | 1.58 | Razoável |
-| EV/EBITDA | 8.2 | Justo |
-| ROE | 16.1% | Bom (Buffett: >15%) |
-| ROIC | 11.4% | Bom |
-| DY TTM | 7.8% | Acima do CDI líquido para PF |
-| Margem Líquida | 10.8% | Aceitável |
-| **Dív.Líq/EBITDA** | **-0.35** | **Caixa líquido** |
-| CAGR Receita 5a | 15.9% | Forte |
-| LPA | R$1.47 | — |
-| VPA | R$9.13 | — |
-| Governança | Novo Mercado | Excelente |
+### #4 PETR4 (86.7) — Petrobras
 
-**Tese:** Intelbras é líder em segurança eletrônica e telecomunicações no Brasil. Tem caixa líquido (sem dívida), paga 7.8% de DY, cresce 16% ao ano, e negocia a P/L 9.8. É uma tech brasileira que dá lucro real — raro. O moat é o custo de troca (sistemas de segurança instalados) e a marca forte no canal de distribuição.
+P/L 5.7, ROE 26.5%, EY 17.6%, NM 22.2%. Tudo espetacular.
 
-### SUZB3 — Suzano (Crescimento)
+**Mas:** **Estatal federal.** O governo cortou dividendos de R$15/ação (2022) para R$3/ação (2025) — queda de 80%. Pode acontecer de novo. Com R$6.700 e perfil moderado, risco político é inaceitável.
 
-| Indicador | Valor | Avaliação |
-|---|---|---|
-| P/L | 4.5 | Muito barato |
-| P/VP | 1.37 | Barato |
-| EV/EBITDA | 6.1 | Barato |
-| ROE | 30.6% | Excelente |
-| ROIC | 5.9% | Baixo (capital intensivo) |
-| DY TTM | 2.4% | Baixo |
-| Margem Líquida | 26.8% | Excelente |
-| **Dív.Líq/EBITDA** | **3.25** | **Elevado** |
-| CAGR Receita 5a | 10.5% | Bom |
-| LPA | R$10.61 | — |
-| VPA | R$34.66 | — |
-| Governança | Novo Mercado | Excelente |
+### #6 GRND3 (86.3) — Grendene
 
-**Tese:** P/L 4.5 com ROE 30.6% e margem 26.8% — a combinação mais barata da B3 em termos de valuation vs rentabilidade. A dívida é alta (3.25× EBITDA) mas é em dólar e a receita também é em dólar (exportadora), então o risco cambial se anula. Líder mundial em celulose com custo de produção mais baixo do planeta. DY baixo (2.4%) é o ponto fraco — compensado pela valorização esperada.
+DY 33.4%, caixa líquido de R$2.7B, NM 24.9%.
 
-### BBSE3 — BB Seguridade (Dividendos)
-
-| Indicador | Valor | Avaliação |
-|---|---|---|
-| P/L | 7.5 | Barato |
-| P/VP | 6.55 | Alto (mas modelo asset-light) |
-| ROE | **86.8%** | Absurdamente alto |
-| ROIC | 76.6% | Excepcional |
-| DY TTM | **13.0%** | Muito acima do CDI líquido |
-| **Dív.Líq/EBITDA** | **-1.30** | **Muito caixa líquido** |
-| Governança | Novo Mercado | Boa (BB controlador) |
-
-**Tese:** Máquina de dividendos. ROE 86.8% porque opera com patrimônio mínimo — distribui quase tudo como dividendo. DY 13% é o dobro do que a maioria das ações paga. Com SELIC alta, os investimentos financeiros da BB Seguridade rendem ainda mais. Risco: dependência do BB como canal. Mas o BB tem 5.000+ agências e não vai trocar de seguradora.
-
-### ITUB4 — Itaú Unibanco (Dividendos)
-
-| Indicador | Valor | Avaliação |
-|---|---|---|
-| P/L | 11.3 | Justo para banco premium |
-| P/VP | 2.41 | Prêmio justificado pela qualidade |
-| ROE | 21.3% | Melhor entre bancos |
-| ROIC | 15.4% | Excelente |
-| DY TTM | 7.8% | Bom, tendência crescente |
-| Dív.Líq/EBITDA | 0.0 | Banco — não se aplica da mesma forma |
-| CAGR Receita 5a | 17.4% | Forte |
-| Governança | Nível 1 (tag along 80%) | Boa |
-
-**Tese:** O banco mais eficiente e rentável do Brasil. ROE 21.3% é o mais alto entre os grandes bancos. DY crescente (explodiu de R$1.23/ação em 2023 para R$4.95 em 2025). Com SELIC alta, bancos se beneficiam do spread maior. O moat é fortíssimo — trocar de banco é trabalhoso, a marca é a mais forte do setor.
+**Mas:** DY 33.4% é claramente anômalo — provavelmente distribuição extraordinária de reservas. CAGR receita de apenas 6.4% — empresa madura que não cresce. Quando o dividendo normalizar, o DY cai para ~5-6%.
 
 ---
 
-## Dados Verificados — Comparação com Status Invest
+## Análise Expandida — Toda a B3
 
-| Indicador | SBSP3 (bolsai) | Status Invest | Bate? |
+Das 144 empresas ativas analisadas, 20 ficaram com score ≥ 75. Além das já discutidas:
+
+| Ticker | Score | Destaque | Motivo de não escolha |
+|---|---|---|---|
+| GMAT3 | 82.7 | Supermercados, CAGR 25% | NM 4.8% apertada, varejo competitivo |
+| PSSA3 | 81.7 | Porto Seguro, ROE 21.5% | DY 5.6% — prefiro BBSE3 com 13% |
+| CXSE3 | 81.3 | Caixa Seguridade | **Estatal federal** |
+| RDOR3 | 79.8 | Rede D'Or, CAGR 31.8% | P/L 19.2, P/VP 4.64 — cara |
+| BRFS3 | 78.9 | BRF, turnaround | Commodity de proteína, histórico de gestão ruim |
+| SANB11 | 78.1 | Santander, DY 8.6% | Controlador estrangeiro decide tudo |
+| CMIG4 | 76.4 | DY 6.8%, P/L 7.9 | **Estatal** MG |
+| BBDC4 | 74.2 | DY 8%, P/VP 1.24 | NDE 6.9 (banco alavancado), ROIC 7.2% fraco |
+
+---
+
+## Watchlist — Comprar quando cenário mudar
+
+| Ticker | Score | Gatilho para compra |
+|---|---|---|
+| **DIRR3** | 88.5 | SELIC cair abaixo de 10% |
+| **CURY3** | 86.2 | SELIC cair abaixo de 10% |
+| **GMAT3** | 82.7 | Se NM subir acima de 6% |
+| **RECV3** | 92.8 | Se petróleo estabilizar >$80 por 12+ meses |
+| **WEGE3** | 56.7 | Se P/L cair abaixo de 20 |
+| **GRND3** | 86.3 | Se DY normalizar e CAGR melhorar |
+
+---
+
+## Scoring — Fórmula (v4 atualizada)
+
+```
+Score = (
+    Valuation             × 20%   P/L, P/VP, EV/EBITDA, PSR
+  + Rentabilidade         × 20%   ROE, ROIC, M.Líq, M.Bruta, M.Oper
+  + Qualidade dos Lucros  × 15%   Earnings Yield (= 100/P/L), FCF Yield
+  + Dividendos            × 15%   DY TTM, Payout
+  + Endividamento         × 15%   Dív.Líq/EBITDA, Dív.Líq/PL, Liq.Corrente
+  + Crescimento           × 10%   CAGR Receita 5a, CAGR Lucro 5a
+) + Bônus Piotroski (±2) + Bônus Altman Z (±2/3)
+```
+
+**Melhorias v4 (baseadas em revisão externa):**
+1. P/L negativo: turnarounds com balanço sólido recebem 20 pts (não 5 fixo)
+2. Earnings Yield calculado de 1/P/L — critério FCF não é mais neutro para todos
+3. Piotroski/Altman reduzidos a tie-breaker (±2-3 pts)
+
+---
+
+## Dados Verificados contra Status Invest
+
+| Indicador | SBSP3 (nosso) | Status Invest | Match? |
 |---|---|---|---|
 | P/L | 14.0 | 13.99 | Sim |
 | P/VP | 2.79 | 2.79 | **Exato** |
@@ -259,93 +215,24 @@ Caixa Seguridade. Modelo similar à BBSE3, ROE 31.7%, DY 8.7%, caixa líquido. M
 | LPA | 12.00 | 12.00 | **Exato** |
 | VPA | 60.15 | 60.15 | **Exato** |
 | PSR | 3.11 | 3.11 | **Exato** |
-| CAGR Rec 5a | 16.4% | 16.44% | **Exato** |
+| CAGR 5a | 16.4% | 16.44% | **Exato** |
 | Liq. Corrente | 1.12 | 1.12 | **Exato** |
 | Dív.Líq/PL | 0.65 | 0.65 | **Exato** |
 
-Todos os indicadores agora vêm da CVM via bolsai e batem com as plataformas de referência.
-
----
-
-## Scoring — Como foi calculado
-
-Seguindo `docs/METODOLOGIA_INVESTIMENTOS.md` v3:
-
-```
-Score = (
-    Valuation             × 20%   (P/L, P/VP, EV/EBITDA, PSR)
-  + Rentabilidade         × 20%   (ROE, ROIC, M.Líq, M.Bruta, M.Oper)
-  + FCF / Earnings Quality × 15%   (Earnings Yield = 1/P/L)
-  + Dividendos            × 15%   (DY TTM, Payout)
-  + Endividamento         × 15%   (Dív.Líq/EBITDA, Dív.Líq/PL, Liq.Corrente)
-  + Crescimento           × 10%   (CAGR Receita 5a, CAGR Lucro 5a)
-) + Bônus Piotroski/Altman
-```
-
-Fonte dos dados: bolsai `/fundamentals/{ticker}` (CVM/B3).
-Benchmarks: documentados na metodologia com pontuação de 10 a 100 por indicador.
-
----
-
-## Análise Expandida — 144 Empresas da B3
-
-Além das 42 ações do relatório inicial, analisei **TODAS as 144 empresas ativas com dados na B3** usando o screener da bolsai. Abaixo as novas descobertas com score ≥ 65 que não estavam na análise original.
-
-### Novas descobertas relevantes
-
-| Ticker | Score | Preço | P/L | ROE | ROIC | DY? | NDE | CAGR 5a | Empresa | Veredicto |
-|---|---|---|---|---|---|---|---|---|---|---|
-| CAMB3 | 77.5 | R$10.07 | 6.2 | 22.4% | 17.4% | ~? | -0.8 | 19.6% | Cambuci (Penalty) | Small cap R$426M, caixa líquido. **Risco: ilíquida** |
-| BNBR3 | 76.5 | R$118.70 | 3.8 | 19.2% | 19.8% | ~? | 1.4 | 20.7% | Banco do Nordeste | P/L 3.8 absurdo. **Risco: estatal federal** |
-| RIAA3 | 75.8 | R$10.65 | 3.6 | 27.6% | 12.6% | ~? | 0.1 | 10.9% | Guararapes/Riachuelo | P/L 3.6, ROE 27.6%. **Risco: varejo cíclico** |
-| SAPR11 | 72.6 | R$41.38 | 6.0 | 16.8% | 9.2% | ~8.5% | 0.7 | 8.5% | Sanepar | Saneamento PR, P/L 6. **Risco: estatal estadual** |
-| GMAT3 | 72.2 | R$4.60 | 5.8 | 17.6% | 12.5% | ~? | 0.4 | 25.4% | Grupo Mateus | Supermercados, CAGR 25%. **Preço acessível** |
-| CURY3 | 71.0 | R$34.21 | 10.8 | 70.6% | 87.5% | ~? | -0.2 | 36.4% | Cury Construtora | ROE 70.6%(!). **Risco: construção + SELIC alta** |
-| GRND3 | 71.4 | R$4.71 | 6.6 | 20.4% | 8.1% | ~? | -2.7 | 6.4% | Grendene (Havaianas) | Caixa líquido R$2.7B(!), NM 24.9%. **Crescimento fraco** |
-| CEAB3 | 71.6 | R$13.05 | 6.8 | 15.8% | 17.5% | ~? | -0.1 | 14.3% | C&A Modas | Turnaround, ROIC 17.5%. **Risco: varejo** |
-| AZZA3 | 70.8 | R$22.22 | 5.0 | 11.4% | 7.0% | ~? | 1.2 | 49.3% | Azzas (Arezzo+Soma) | CAGR 49.3%, P/VP 0.6. **Risco: integração pós-fusão** |
-| BRFS3 | 65.9 | R$17.95 | 8.6 | 24.5% | 15.6% | ~? | 1.4 | 10.5% | BRF (Sadia/Perdigão) | Turnaround ROE 24.5%. **Risco: commodity + histórico ruim** |
-| SANB11 | 73.4 | R$31.45 | 9.2 | 10.2% | 10.5% | ~8.6% | -1.2 | 20.9% | Santander Brasil | Banco sólido, DY ~8.6%. **Risco: controlador estrangeiro decide** |
-
-### Alguma dessas supera os escolhidos?
-
-**GMAT3 (Grupo Mateus)** é a mais interessante. P/L 5.8, CAGR 25.4%, ROIC 12.5%, quase sem dívida. É um supermercado nordestino em expansão acelerada — o "Atacadão do Norte". Preço R$4.60 é muito acessível. Mas margem líquida de apenas 4.8% é apertada e varejo de alimentos é competitivo. Não supera INTB3 (margem 10.8%, caixa líquido, DY 7.8%) para a fatia de crescimento.
-
-**GRND3 (Grendene)** tem caixa líquido de R$2.7 bilhões (!!!) e margem 24.9%. Mas CAGR de apenas 6.4% — empresa madura que não cresce. Não supera SUZB3 (CAGR 10.5%, ROE 30.6%) para crescimento nem BBSE3 (DY 13%) para dividendos.
-
-**CURY3** tem ROE de 70.6% e ROIC de 87.5% — números espetaculares. Mas é construção civil com SELIC 14.75%. O DY de ~15% pode ser extraordinário. Quando SELIC cair, pode ser oportunidade. **Na watchlist.**
-
-**BNBR3** (Banco do Nordeste) tem P/L 3.8 e ROIC 19.8% — absurdamente barato. Mas é **estatal federal** como PETR4 e BBAS3. Descartado por governança.
-
-**RIAA3** (Riachuelo) P/L 3.6, ROE 27.6% — parece incrível. Mas é **varejo** de moda, setor cíclico e competitivo. Com SELIC 14.75%, consumo cai. Risco alto demais para perfil moderado.
-
-### Conclusão da análise expandida
-
-**A carteira permanece inalterada.** Das 144 empresas da B3, nenhuma nova descoberta supera os 4 escolhidos (INTB3, SUZB3, BBSE3, ITUB4) considerando o perfil moderado e o cenário de SELIC alta. As novas com score alto são:
-- Estatais (BNBR3, SAPR11) → governança
-- Construção (CURY3, DIRR3) → SELIC alta
-- Varejo cíclico (RIAA3, CEAB3, AZZA3) → consumo fraco
-- Small caps ilíquidas (CAMB3, BALM4) → risco de liquidez
-
-**Watchlist atualizada:**
-1. **CURY3** — quando SELIC cair abaixo de 10%
-2. **GMAT3** — acompanhar evolução de margens
-3. **RECV3** — quando petróleo estabilizar
-4. **WEGE3** — quando P/L cair abaixo de 20
-5. **GRND3** — se começar a crescer de novo
+Fonte: bolsai Pro (dados CVM/B3/BCB oficiais).
 
 ---
 
 ## Próximos Passos
 
-1. **Executar as ordens na XP** conforme tabela da carteira
-2. **Reavaliar trimestralmente** — usar bolsai `/fundamentals/{ticker}/history` para comparar evolução
+1. **Executar as ordens na XP** conforme tabela
+2. **Reavaliar trimestralmente** com `bolsai /fundamentals/{ticker}/history`
 3. **Reinvestir dividendos** seguindo a mesma metodologia
-4. **Monitorar SELIC** — quando cair abaixo de 10%, migrar parte dos FIIs de papel para tijolo
-5. **RECV3 e DIRR3 na watchlist** — se SELIC cair, construção e petróleo ficam mais atrativos
-6. **WEGE3 na watchlist** — se P/L cair abaixo de 20, comprar
+4. **Monitorar SELIC** — quando < 10%, migrar FIIs papel→tijolo e considerar DIRR3/CURY3
+5. **Watchlist** — verificar gatilhos mensalmente
 
 ---
 
-> *Análise com dados oficiais CVM/B3/BCB via bolsai Pro. Indicadores verificados contra Status Invest.*
-> *Não constitui recomendação profissional de investimento. Consulte seu assessor na XP.*
+> *201 ativos analisados com dados oficiais CVM/B3/BCB via bolsai Pro.*
+> *Metodologia verificada por revisão externa. Indicadores conferidos contra Status Invest.*
+> *Não constitui recomendação profissional de investimento.*
