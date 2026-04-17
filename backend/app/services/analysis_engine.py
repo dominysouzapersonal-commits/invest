@@ -13,12 +13,19 @@ BR_ETFS = {
     "B5P211", "FIXA11", "SPXI11", "MATB11", "FIND11",
 }
 
+BR_UNITS = {
+    "TAEE11", "SANB11", "KLBN11", "SAPR11", "ALUP11", "ENBR11",
+    "UNIT11", "ENGI11", "AESB11",
+}
+
 
 def detect_asset_type(ticker: str) -> str:
     t = ticker.upper().replace(".SA", "")
     if ".SA" in ticker.upper() or _is_br_ticker(t):
         if t in BR_ETFS:
             return "br_etf"
+        if t in BR_UNITS:
+            return "br_stock"
         if t.endswith("11") and len(t) >= 6:
             return "fii"
         if t.endswith(("34", "35", "33")) and len(t) >= 5:
