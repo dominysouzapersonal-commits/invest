@@ -62,13 +62,20 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
     quote_data = quote_data if isinstance(quote_data, dict) else {}
     brapi_fund = brapi_fund if isinstance(brapi_fund, dict) else {}
 
-    # For FIIs: calculate DY from actual dividend payments
-    if asset_type == "fii":
-        _enrich_fii_data(quote_data, brapi_fund)
+    # Calculate DY from real dividend payments (all BR asset types)
+    _enrich_dividend_data(quote_data, brapi_fund)
 
     # For BR ETFs: calculate returns from historical prices
     if asset_type == "br_etf":
         await _enrich_etf_data(clean, quote_data, brapi_fund)
+
+    # Map brapi growth fields to standard names
+    if brapi_fund.get("revenue_growth") is not None and brapi_fund.get("revenue_growth_1y") is None:
+        rg = brapi_fund["revenue_growth"]
+        brapi_fund["revenue_growth_1y"] = round(rg * 100, 2) if -1.5 < rg < 1.5 and rg != 0 else rg
+    if brapi_fund.get("earnings_growth") is not None and brapi_fund.get("profit_growth_1y") is None:
+        eg = brapi_fund["earnings_growth"]
+        brapi_fund["profit_growth_1y"] = round(eg * 100, 2) if -1.5 < eg < 1.5 and eg != 0 else eg
 
     # FMP enrichment for BR BDRs (they may have US tickers) — optional
     fmp_scores: dict = {}
@@ -92,8 +99,8 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
     return _build_fundamental_data(ticker, asset_type, quote_data, brapi_fund, extra)
 
 
-def _enrich_fii_data(quote_data: dict, brapi_fund: dict) -> None:
-    """Calculate DY, monthly avg, and dividend consistency from actual payments."""
+def _enrich_dividend_data(quote_data: dict, brapi_fund: dict) -> None:
+    """Calculate DY from actual dividend payments for any BR asset."""
     from datetime import datetime
 
     divs_data = quote_data.get("dividends_data")
@@ -122,26 +129,8 @@ def _enrich_fii_data(quote_data: dict, brapi_fund: dict) -> None:
 
     if total_12m > 0:
         dy = round(total_12m / price * 100, 2)
-        monthly_avg = round(total_12m / 12, 4)
-
         quote_data["dividend_yield"] = dy
         brapi_fund["dividend_yield"] = dy
-        quote_data["_fii_monthly_dividend"] = monthly_avg
-        quote_data["_fii_payments_12m"] = payments_12m
-        quote_data["_fii_total_div_12m"] = round(total_12m, 4)
-
-    # Count years paying dividends (2020+)
-    yearly: dict[int, float] = {}
-    for d in cash_divs:
-        try:
-            yr = int(d.get("paymentDate", "")[:4])
-            if yr >= 2019:
-                yearly[yr] = yearly.get(yr, 0) + float(d.get("rate", 0))
-        except (ValueError, TypeError):
-            continue
-
-    years_paying = len([v for v in yearly.values() if v > 0])
-    quote_data["_fii_years_paying"] = years_paying
 
 
 async def _enrich_etf_data(ticker: str, quote_data: dict, brapi_fund: dict) -> None:
