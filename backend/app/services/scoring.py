@@ -15,10 +15,17 @@ RECOMMENDATIONS = {
 # Inspired by Graham, Buffett, Barsi & Piotroski for Brazilian equities.
 # ---------------------------------------------------------------------------
 
-def _score_pe(val: float | None) -> float | None:
+def _score_pe(val: float | None, data: "FundamentalData | None" = None) -> float | None:
+    """Score P/L. Negative P/L = loss, but turnarounds with strong balance
+    sheet get partial credit instead of flat 5 (Grok improvement #1)."""
     if val is None:
         return None
     if val <= 0:
+        if data is not None:
+            has_low_debt = (data.net_debt_ebitda is not None and data.net_debt_ebitda < 2)
+            has_good_roic = (data.roic is not None and data.roic > 8)
+            if has_low_debt or has_good_roic:
+                return 20
         return 5
     if val < 10:
         return 100
@@ -315,7 +322,7 @@ def _collect(entries: list[tuple[str, float | None]]) -> tuple[float, dict]:
 def _score_valuation(data: FundamentalData) -> dict:
     asset_type = data.asset_type or "stock"
     entries = [
-        ("P/L", data.pe_ratio, _score_pe(data.pe_ratio)),
+        ("P/L", data.pe_ratio, _score_pe(data.pe_ratio, data)),
         ("P/VP", data.pb_ratio, _score_pb(data.pb_ratio, asset_type)),
         ("EV/EBITDA", data.ev_ebitda, _score_ev_ebitda(data.ev_ebitda)),
         ("PSR", data.psr, _score_psr(data.psr)),
@@ -337,9 +344,14 @@ def _score_profitability(data: FundamentalData) -> dict:
 
 
 def _score_fcf_quality(data: FundamentalData) -> dict:
+    # Calculate Earnings Yield from P/L when not provided (Grok improvement #2)
+    ey = data.earnings_yield
+    if ey is None and data.pe_ratio is not None and data.pe_ratio > 0:
+        ey = round(100 / data.pe_ratio, 2)
+
     entries = [
         ("FCF Yield", data.fcf_yield, _score_fcf_yield(data.fcf_yield)),
-        ("Earnings Yield", data.earnings_yield, _score_earnings_yield(data.earnings_yield)),
+        ("Earnings Yield", ey, _score_earnings_yield(ey)),
     ]
     score, details = _collect(entries)
     return {"score": score, "details": details}
@@ -396,17 +408,18 @@ def _score_growth(data: FundamentalData) -> dict:
 # ---------------------------------------------------------------------------
 
 def _advanced_score_adjustment(data: FundamentalData) -> float:
+    """Piotroski/Altman as tie-breaker, not major factor (Grok improvement #5)."""
     adj = 0.0
     if data.piotroski_score is not None:
         if data.piotroski_score >= 7:
-            adj += 4
+            adj += 2
         elif data.piotroski_score <= 3:
-            adj -= 3
+            adj -= 2
     if data.altman_z_score is not None:
         if data.altman_z_score > 2.99:
-            adj += 3
+            adj += 2
         elif data.altman_z_score < 1.81:
-            adj -= 4
+            adj -= 3
     return adj
 
 
