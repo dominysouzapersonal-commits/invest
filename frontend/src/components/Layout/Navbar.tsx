@@ -9,6 +9,7 @@ const NAV = [
   { to: '/portfolio', label: 'Portfolio' },
   { to: '/compare', label: 'Comparador' },
   { to: '/watchlist', label: 'Watchlist' },
+  { to: '/calculators', label: 'Calculadoras' },
   { to: '/settings', label: 'Config' },
 ];
 

@@ -10,6 +10,7 @@ import ComparePage from './pages/ComparePage';
 import WatchlistPage from './pages/WatchlistPage';
 import SettingsPage from './pages/SettingsPage';
 import ReportPage from './pages/ReportPage';
+import CalculatorsPage from './pages/CalculatorsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import GoogleCallbackPage from './pages/GoogleCallbackPage';
@@ -71,6 +72,7 @@ export default function App() {
               <Route path="/compare" element={<ComparePage />} />
               <Route path="/watchlist" element={<WatchlistPage />} />
               <Route path="/report" element={<ReportPage />} />
+              <Route path="/calculators" element={<CalculatorsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Routes>
