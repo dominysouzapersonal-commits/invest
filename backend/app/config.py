@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     database_name: str = "investimentos"
     brapi_token: str = ""
     fmp_api_key: str = ""
+    bolsai_api_key: str = ""
     cache_ttl_minutes: int = 30
     jwt_secret: str = "change-me-in-production"
     jwt_algorithm: str = "HS256"

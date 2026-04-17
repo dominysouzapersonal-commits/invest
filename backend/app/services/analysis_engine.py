@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from app.schemas.asset import FundamentalData
-from app.services.data_providers import brapi, fmp
+from app.services.data_providers import brapi, fmp, bolsai
 
 logger = logging.getLogger(__name__)
 
@@ -50,93 +50,130 @@ async def get_full_asset_data(ticker: str) -> FundamentalData:
 
 
 async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
-    """BR assets: brapi (quote, margens, ROE) + FMP via ADR (P/VP, PSR, D.Líq/EBITDA)."""
+    """BR assets: bolsai (fundamentals) + brapi (real-time quote + dividends)."""
     clean = ticker.upper().replace(".SA", "")
 
-    quote_data, brapi_fund = await asyncio.gather(
+    # For BR ETFs: brapi only (bolsai doesn't cover ETFs)
+    if asset_type == "br_etf":
+        quote_data = await brapi.get_quote(clean) or {}
+        brapi_fund = await brapi.get_fundamentals(clean) or {}
+        _enrich_dividend_data(quote_data, brapi_fund)
+        await _enrich_etf_data(clean, quote_data, brapi_fund)
+        return _build_fundamental_data(ticker, asset_type, quote_data, brapi_fund, {})
+
+    # For FIIs: bolsai FII endpoint
+    if asset_type == "fii":
+        return await _fetch_br_fii(ticker, clean)
+
+    # For stocks/BDRs: bolsai fundamentals + brapi real-time + bolsai dividends
+    bolsai_fund, bolsai_div, brapi_quote = await asyncio.gather(
+        bolsai.get_fundamentals(clean),
+        bolsai.get_dividends(clean),
         brapi.get_quote(clean),
-        brapi.get_fundamentals(clean),
         return_exceptions=True,
     )
 
-    quote_data = quote_data if isinstance(quote_data, dict) else {}
-    brapi_fund = brapi_fund if isinstance(brapi_fund, dict) else {}
+    bf = bolsai_fund if isinstance(bolsai_fund, dict) else {}
+    bd = bolsai_div if isinstance(bolsai_div, dict) else {}
+    bq = brapi_quote if isinstance(brapi_quote, dict) else {}
 
-    # Calculate DY from real dividend payments (all BR asset types)
-    _enrich_dividend_data(quote_data, brapi_fund)
-
-    # For BR ETFs: calculate returns from historical prices
-    if asset_type == "br_etf":
-        await _enrich_etf_data(clean, quote_data, brapi_fund)
-
-    # Map brapi growth fields to standard names
-    if brapi_fund.get("revenue_growth") is not None and brapi_fund.get("revenue_growth_1y") is None:
-        rg = brapi_fund["revenue_growth"]
-        brapi_fund["revenue_growth_1y"] = round(rg * 100, 2) if -1.5 < rg < 1.5 and rg != 0 else rg
-    if brapi_fund.get("earnings_growth") is not None and brapi_fund.get("profit_growth_1y") is None:
-        eg = brapi_fund["earnings_growth"]
-        brapi_fund["profit_growth_1y"] = round(eg * 100, 2) if -1.5 < eg < 1.5 and eg != 0 else eg
-
-    # FMP enrichment via ADR ticker (corrects P/VP, PSR, D.Líq/EBITDA)
-    from app.services.data_providers.br_adr_map import BR_TO_ADR
-    adr = BR_TO_ADR.get(clean)
-    fmp_ratios: dict = {}
-    fmp_metrics: dict = {}
-    fmp_scores: dict = {}
-    if adr:
-        try:
-            fmp_r, fmp_m, fmp_s = await asyncio.gather(
-                fmp.get_fundamentals(adr),
-                fmp._get("key-metrics-ttm", {"symbol": adr}),
-                fmp.get_financial_scores(adr),
-                return_exceptions=True,
-            )
-            fmp_ratios = fmp_r if isinstance(fmp_r, dict) else {}
-            fmp_metrics = fmp_m[0] if isinstance(fmp_m, list) and fmp_m else {}
-            fmp_scores = fmp_s if isinstance(fmp_s, dict) else {}
-        except Exception:
-            pass
-
-    # Override brapi module values with FMP where FMP is more accurate
-    if fmp_ratios.get("pb_ratio") is not None:
-        brapi_fund["pb_ratio"] = fmp_ratios["pb_ratio"]
-    if fmp_ratios.get("psr") is not None:
-        brapi_fund["psr"] = fmp_ratios["psr"]
-    if fmp_metrics.get("netDebtToEBITDATTM") is not None:
-        brapi_fund["net_debt_ebitda"] = fmp_metrics["netDebtToEBITDATTM"]
-    if fmp_ratios.get("roic") is not None:
-        brapi_fund["roic"] = fmp_ratios["roic"]
-
-    # Calculate EV/EBITDA from FMP EV + brapi EBITDA
-    fmp_ev = fmp_metrics.get("enterpriseValueTTM")
-    brapi_ebitda = brapi_fund.get("ebitda")
-    if fmp_ev and brapi_ebitda and brapi_ebitda > 0:
-        brapi_fund["ev_ebitda"] = round(fmp_ev / brapi_ebitda, 2)
-
-    # Calculate VPA and LPA
-    price = quote_data.get("price")
-    pb_ratio = brapi_fund.get("pb_ratio")
-    if price and pb_ratio and pb_ratio > 0:
-        brapi_fund["book_value_per_share"] = round(price / pb_ratio, 2)
-
-    eps = quote_data.get("earnings_per_share")
-    if eps:
-        brapi_fund["eps"] = eps
-
-    extra = {
-        "recommendation_key": brapi_fund.get("recommendation_key"),
-        "recommendation_mean": brapi_fund.get("recommendation_mean"),
-        "target_mean_price": brapi_fund.get("target_mean_price"),
-        "target_high_price": brapi_fund.get("target_high_price"),
-        "target_low_price": brapi_fund.get("target_low_price"),
-        "number_of_analysts": brapi_fund.get("number_of_analyst_opinions"),
-        "altman_z_score": fmp_scores.get("altman_z_score"),
-        "piotroski_score": fmp_scores.get("piotroski_score"),
-        "eps": brapi_fund.get("eps"),
-        "book_value_per_share": brapi_fund.get("book_value_per_share"),
+    # Build quote from brapi (real-time) + bolsai (fundamentals)
+    quote_data = {
+        "name": bf.get("corporate_name") or bq.get("name") or clean,
+        "price": bq.get("price") or bf.get("close_price"),
+        "change_percent": bq.get("change_percent"),
+        "volume": bq.get("volume"),
+        "market_cap": bf.get("market_cap") or bq.get("market_cap"),
+        "sector": None,
+        "industry": None,
+        "logo_url": bq.get("logo_url"),
+        "currency": "BRL",
     }
 
-    return _build_fundamental_data(ticker, asset_type, quote_data, brapi_fund, extra)
+    # Get sector from company endpoint (lightweight)
+    try:
+        company = await bolsai.get_company(clean)
+        if company and isinstance(company, dict):
+            quote_data["sector"] = company.get("sector")
+    except Exception:
+        pass
+
+    # Build fundamentals from bolsai (all accurate CVM data)
+    fund = {
+        "pe_ratio": bf.get("pl"),
+        "pb_ratio": bf.get("pvp"),
+        "ev_ebitda": bf.get("ev_ebitda"),
+        "psr": bf.get("p_sr"),
+        "ev_revenue": bf.get("ev_ebit"),
+        "peg_ratio": None,
+        "price_to_fcf": None,
+
+        "roe": bf.get("roe"),
+        "roa": bf.get("roa"),
+        "roic": bf.get("roic"),
+        "net_margin": bf.get("net_margin"),
+        "gross_margin": bf.get("gross_margin"),
+        "ebitda_margin": bf.get("ebitda_margin"),
+        "operating_margin": bf.get("ebit_margin"),
+
+        "current_ratio": bf.get("current_ratio"),
+        "debt_to_equity": bf.get("debt_equity"),
+        "net_debt_ebitda": bf.get("net_debt_ebitda"),
+        "net_debt_equity": bf.get("net_debt_equity"),
+
+        "revenue_growth_5y": bf.get("cagr_revenue_5y"),
+        "profit_growth_5y": bf.get("cagr_earnings_5y"),
+
+        "dividend_yield": bd.get("dividend_yield_ttm") if bd else None,
+
+        "ebitda": bf.get("ebitda"),
+        "total_debt": bf.get("total_debt"),
+        "free_cashflow": None,
+        "operating_cashflow": None,
+    }
+
+    extra = {
+        "eps": bf.get("lpa"),
+        "book_value_per_share": bf.get("vpa"),
+    }
+
+    return _build_fundamental_data(ticker, asset_type, quote_data, fund, extra)
+
+
+async def _fetch_br_fii(ticker: str, clean: str) -> FundamentalData:
+    """FIIs: bolsai FII endpoint for fundamentals + distributions for DY."""
+    fii_data, fii_dist, brapi_quote = await asyncio.gather(
+        bolsai.get_fii(clean),
+        bolsai.get_fii_distributions(clean),
+        brapi.get_quote(clean),
+        return_exceptions=True,
+    )
+
+    fi = fii_data if isinstance(fii_data, dict) else {}
+    fd = fii_dist if isinstance(fii_dist, dict) else {}
+    bq = brapi_quote if isinstance(brapi_quote, dict) else {}
+
+    quote_data = {
+        "name": fi.get("name") or bq.get("name") or clean,
+        "price": bq.get("price") or fi.get("close_price"),
+        "change_percent": bq.get("change_percent"),
+        "volume": bq.get("volume"),
+        "market_cap": None,
+        "sector": fi.get("segment"),
+        "logo_url": bq.get("logo_url"),
+        "currency": "BRL",
+    }
+
+    fund = {
+        "pb_ratio": fi.get("pvp"),
+        "dividend_yield": fd.get("dividend_yield_ttm") if fd else (fi.get("dividend_yield_ttm")),
+    }
+
+    extra = {
+        "book_value_per_share": fi.get("book_value_per_share"),
+    }
+
+    return _build_fundamental_data(ticker, "fii", quote_data, fund, extra)
 
 
 def _enrich_dividend_data(quote_data: dict, brapi_fund: dict) -> None:
@@ -316,13 +353,19 @@ async def get_historical(ticker: str, period: str = "1y") -> list[dict]:
 
     if is_br:
         clean = ticker.upper().replace(".SA", "")
+        period_days_map = {"1mo": 22, "3mo": 66, "6mo": 126, "1y": 252, "2y": 504, "5y": 1260}
+        limit = period_days_map.get(period, 252)
+        # Primary: bolsai (adjusted prices from B3)
+        prices = await bolsai.get_history(clean, limit=limit)
+        if prices:
+            return prices
+        # Fallback: brapi
         range_map = {"1mo": "1mo", "3mo": "3mo", "6mo": "6mo", "1y": "1y", "2y": "2y", "5y": "5y"}
-        brapi_range = range_map.get(period, "1y")
-        prices = await brapi.get_historical(clean, range_=brapi_range)
+        prices = await brapi.get_historical(clean, range_=range_map.get(period, "1y"))
         if prices:
             return prices
 
-    # Fallback: FMP historical
+    # Fallback: FMP historical (US stocks)
     from datetime import datetime, timedelta
     period_days = {"1mo": 30, "3mo": 90, "6mo": 180, "1y": 365, "2y": 730, "5y": 1825}
     days = period_days.get(period, 365)
