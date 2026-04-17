@@ -50,7 +50,7 @@ async def get_full_asset_data(ticker: str) -> FundamentalData:
 
 
 async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
-    """BR assets: brapi (primary) + FMP for DCF/scores where available."""
+    """BR assets: brapi (quote, margens, ROE) + FMP via ADR (P/VP, PSR, D.Líq/EBITDA)."""
     clean = ticker.upper().replace(".SA", "")
 
     quote_data, brapi_fund = await asyncio.gather(
@@ -77,13 +77,51 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
         eg = brapi_fund["earnings_growth"]
         brapi_fund["profit_growth_1y"] = round(eg * 100, 2) if -1.5 < eg < 1.5 and eg != 0 else eg
 
-    # FMP enrichment for BR BDRs (they may have US tickers) — optional
+    # FMP enrichment via ADR ticker (corrects P/VP, PSR, D.Líq/EBITDA)
+    from app.services.data_providers.br_adr_map import BR_TO_ADR
+    adr = BR_TO_ADR.get(clean)
+    fmp_ratios: dict = {}
+    fmp_metrics: dict = {}
     fmp_scores: dict = {}
-    if asset_type == "bdr":
+    if adr:
         try:
-            fmp_scores = await fmp.get_financial_scores(clean) or {}
+            fmp_r, fmp_m, fmp_s = await asyncio.gather(
+                fmp.get_fundamentals(adr),
+                fmp._get("key-metrics-ttm", {"symbol": adr}),
+                fmp.get_financial_scores(adr),
+                return_exceptions=True,
+            )
+            fmp_ratios = fmp_r if isinstance(fmp_r, dict) else {}
+            fmp_metrics = fmp_m[0] if isinstance(fmp_m, list) and fmp_m else {}
+            fmp_scores = fmp_s if isinstance(fmp_s, dict) else {}
         except Exception:
             pass
+
+    # Override brapi module values with FMP where FMP is more accurate
+    if fmp_ratios.get("pb_ratio") is not None:
+        brapi_fund["pb_ratio"] = fmp_ratios["pb_ratio"]
+    if fmp_ratios.get("psr") is not None:
+        brapi_fund["psr"] = fmp_ratios["psr"]
+    if fmp_metrics.get("netDebtToEBITDATTM") is not None:
+        brapi_fund["net_debt_ebitda"] = fmp_metrics["netDebtToEBITDATTM"]
+    if fmp_ratios.get("roic") is not None:
+        brapi_fund["roic"] = fmp_ratios["roic"]
+
+    # Calculate EV/EBITDA from FMP EV + brapi EBITDA
+    fmp_ev = fmp_metrics.get("enterpriseValueTTM")
+    brapi_ebitda = brapi_fund.get("ebitda")
+    if fmp_ev and brapi_ebitda and brapi_ebitda > 0:
+        brapi_fund["ev_ebitda"] = round(fmp_ev / brapi_ebitda, 2)
+
+    # Calculate VPA and LPA
+    price = quote_data.get("price")
+    pb_ratio = brapi_fund.get("pb_ratio")
+    if price and pb_ratio and pb_ratio > 0:
+        brapi_fund["book_value_per_share"] = round(price / pb_ratio, 2)
+
+    eps = quote_data.get("earnings_per_share")
+    if eps:
+        brapi_fund["eps"] = eps
 
     extra = {
         "recommendation_key": brapi_fund.get("recommendation_key"),
@@ -94,6 +132,8 @@ async def _fetch_br_asset(ticker: str, asset_type: str) -> FundamentalData:
         "number_of_analysts": brapi_fund.get("number_of_analyst_opinions"),
         "altman_z_score": fmp_scores.get("altman_z_score"),
         "piotroski_score": fmp_scores.get("piotroski_score"),
+        "eps": brapi_fund.get("eps"),
+        "book_value_per_share": brapi_fund.get("book_value_per_share"),
     }
 
     return _build_fundamental_data(ticker, asset_type, quote_data, brapi_fund, extra)
