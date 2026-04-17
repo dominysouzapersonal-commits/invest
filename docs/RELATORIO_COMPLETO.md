@@ -107,16 +107,18 @@
 
 | # | Ativo | Categoria | Qtd | Preço | Total | Score |
 |---|---|---|---|---|---|---|
-| 1 | **INTB3** | Crescimento | 80 | R$14.39 | R$1.151,20 | 80.0 |
-| 2 | **SUZB3** | Crescimento | 25 | R$47.53 | R$1.188,25 | 75.8 |
+| 1 | **INTB3** | Crescimento | 100 | R$14.39 | R$1.439,00 | 80.0 |
+| 2 | **SUZB3** | Crescimento | 20 | R$47.53 | R$950,60 | 75.8 |
 | 3 | **BBSE3** | Dividendos | 20 | R$35.01 | R$700,20 | 86.4 |
 | 4 | **ITUB4** | Dividendos | 13 | R$46.98 | R$610,74 | 77.9 |
 | 5 | **MXRF11** | FII | 68 | R$9.88 | R$671,84 | — |
 | 6 | **KNCR11** | FII | 6 | R$106.35 | R$638,10 | — |
 | 7 | **NASD11** | ETF Intl | 54 | R$18.32 | R$989,28 | — |
 | 8 | **Tesouro Selic** | Reserva | — | — | R$670,00 | — |
-| | | | | **Total** | **R$6.619,61** | |
-| | | | | **Troco** | **R$80,39** | |
+| | | | | **Total** | **R$6.669,76** | |
+| | | | | **Troco** | **R$30,24** | |
+
+*Nota: INTB3 negocia em lote padrão de 100 ações na B3. SUZB3 ajustada de 25→20 para caber no budget.*
 
 ---
 

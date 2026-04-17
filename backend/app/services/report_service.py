@@ -52,8 +52,8 @@ TICKERS_FIIS = [
 TICKERS_ETF_INTL = ["IVVB11", "NASD11", "HASH11"]
 
 PORTFOLIO_PICKS = [
-    {"ticker": "INTB3", "cat": "Crescimento", "qty": 80, "price": 14.39},
-    {"ticker": "SUZB3", "cat": "Crescimento", "qty": 25, "price": 47.53},
+    {"ticker": "INTB3", "cat": "Crescimento", "qty": 100, "price": 14.39},
+    {"ticker": "SUZB3", "cat": "Crescimento", "qty": 20, "price": 47.53},
     {"ticker": "BBSE3", "cat": "Dividendos", "qty": 20, "price": 35.01},
     {"ticker": "ITUB4", "cat": "Dividendos", "qty": 13, "price": 46.98},
     {"ticker": "MXRF11", "cat": "FIIs", "qty": 68, "price": 9.88},
