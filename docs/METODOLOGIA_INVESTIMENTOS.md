@@ -1,7 +1,7 @@
 # Metodologia de Análise de Investimentos — InvestAnalytics
 
 > Documento de referência permanente. Seguir este padrão em toda análise futura.
-> Última atualização: 17 de abril de 2026
+> Última atualização: 18 de abril de 2026 (v3 — dados CVM via bolsai)
 
 ---
 
@@ -31,12 +31,18 @@ Não usamos análise técnica (gráficos, suportes, resistências, RSI, médias 
 
 ## 2. Fontes de Dados
 
-| Fonte | Tipo | O que fornece |
-|---|---|---|
-| **brapi.dev (Premium)** | API paga | Cotações BR em tempo real, fundamentalistas desde 2009, DRE, balanço, fluxo de caixa, dividendos históricos, SELIC, IPCA, câmbio |
-| **FMP (Financial Modeling Prep)** | API paga | DCF, Piotroski F-Score, Altman Z-Score, insider trades, consenso de analistas, price targets, ETF holdings, receita por segmento |
+| Fonte | Tipo | Custo | O que fornece | Quando usar |
+|---|---|---|---|---|
+| **bolsai** (`usebolsai.com`) | API Pro | R$ 29/mês | 27 indicadores CVM/B3, dividendos com JCP split, FIIs, DRE/balanço raw, screener, macro (SELIC/IPCA/CDI/USD) | **PRIMARY para BR** — todos os indicadores fundamentalistas |
+| **brapi.dev** (Premium) | API paga | Já contratada | Cotações em tempo real, preço intraday, ETFs BR | **Cotação real-time** e ETFs BR apenas |
+| **FMP** (Financial Modeling Prep) | API paga | Já contratada | Profile, ratios TTM, Piotroski, Altman Z, DCF, analyst grades, RSI, insider trades, ETF holdings | **PRIMARY para US stocks** |
 
-Nunca usar dados de uma única fonte. Cruzar brapi (melhor para BR) com FMP (melhor para US e scores avançados).
+**Regra de prioridade para ações BR:**
+1. **bolsai** para fundamentos (P/L, P/VP, ROE, ROIC, margens, DY, LPA, VPA, CAGR, dívida) — dados da CVM, batem com Status Invest
+2. **brapi** para preço em tempo real, variação do dia, volume, histórico de preço (OHLCV)
+3. **FMP** apenas como fallback ou para dados não disponíveis na bolsai (Piotroski, Altman Z)
+
+**Por que bolsai e não brapi para fundamentos:** Os módulos `defaultKeyStatistics` e `financialData` da brapi usam dados do Yahoo Finance global que contam shares incorretamente para ações BR (incluem units/ADRs), corrompendo P/VP, EV/EBITDA e VPA. A bolsai usa dados oficiais da CVM com shares_outstanding corretos da B3. Documentação completa: `docs/BOLSAI_REFERENCE.md`.
 
 ---
 
@@ -54,51 +60,54 @@ Analisar no mínimo 40 ativos distribuídos em:
 
 ---
 
-## 4. Os 10 Critérios de Análise
+## 4. Os 6 Critérios de Análise (Scoring Quantitativo)
+
+Todos os indicadores abaixo são obtidos da **bolsai** (fonte CVM/B3) para ações BR. Para US, via FMP.
 
 ### Critério 1: Valuation (Peso 20%)
 
 "Nunca pagar caro, mesmo por uma empresa boa." — Graham
 
-| Indicador | Ideal | Bom | Ruim | Fonte | Quando usar |
-|---|---|---|---|---|---|
-| P/L (Preço/Lucro) | < 12 | 12-20 | > 30 | brapi/FMP | Sempre (exceto prejuízo) |
-| P/VP (Preço/Valor Patrimonial) | < 1.5 | 1.5-3 | > 5 | brapi/FMP | Sempre |
-| EV/EBITDA | < 7 | 7-12 | > 18 | brapi/FMP | Sempre (melhor que P/L para endividadas) |
-| EV/Revenue (EV/Receita) | < 2 | 2-5 | > 8 | brapi/FMP | Para empresas em prejuízo ou margens baixas (techs, growth) |
-| P/FCF (Preço/Free Cash Flow) | < 12 | 12-20 | > 30 | FMP | Sempre que FCF disponível |
-| PEG Ratio | < 1 | 1-2 | > 3 | brapi/FMP | Para growth stocks (P/L ajustado pelo crescimento) |
+| Indicador | 100 pts | 85 pts | 65 pts | 40 pts | 15 pts | Fonte bolsai |
+|---|---|---|---|---|---|---|
+| P/L | < 10 | 10-15 | 15-20 | 20-30 | > 30 | `pl` |
+| P/VP | < 1.5 | 1.5-2 | 2-3 | 3-5 | > 5 | `pvp` |
+| EV/EBITDA | < 6 | 6-8 | 8-10 | 10-14 | > 14 | `ev_ebitda` |
+| PSR | < 1.5 | 1.5-2 | 2-3 | 3-5 | > 5 | `p_sr` |
 
 **Regras:**
-- P/L negativo = empresa com prejuízo = penalidade máxima.
-- Se P/L não disponível (prejuízo), usar EV/Revenue como substituto.
-- EV/EBITDA é mais confiável que P/L porque inclui dívida e ignora estrutura de capital.
+- P/L negativo = prejuízo = 5 pts (penalidade máxima)
+- EV/EBITDA é mais confiável que P/L porque inclui dívida e ignora estrutura de capital
+- PSR é útil para empresas em prejuízo onde P/L não funciona
 
 ### Critério 2: Rentabilidade (Peso 20%)
 
 "Procure empresas com ROE consistentemente acima de 15%." — Buffett
 
-| Indicador | Ideal | Bom | Ruim | Referência |
-|---|---|---|---|---|
-| ROE | > 20% | 12-20% | < 8% | Buffett: >15% sustentado |
-| ROA | > 10% | 5-10% | < 3% | Eficiência do ativo total |
-| ROIC | > 15% | 8-15% | < 5% | Retorno sobre capital investido |
-| Margem Líquida | > 20% | 10-20% | < 5% | Quanto sobra de lucro |
-| Margem Bruta | > 40% | 25-40% | < 15% | Poder de precificação |
-| Margem Operacional | > 20% | 10-20% | < 5% | Eficiência operacional |
+| Indicador | 100 pts | 80 pts | 60 pts | 35 pts | 10 pts | Fonte bolsai |
+|---|---|---|---|---|---|---|
+| ROE | > 25% | 15-25% | 10-15% | 5-10% | < 5% | `roe` |
+| ROIC | > 20% | 12-20% | 8-12% | 4-8% | < 4% | `roic` |
+| Margem Líquida | > 25% | 15-25% | 8-15% | 3-8% | < 3% | `net_margin` |
+| Margem Bruta | > 50% | 35-50% | 20-35% | 10-20% | < 10% | `gross_margin` |
+| Margem Operacional | > 25% | 15-25% | 8-15% | 3-8% | < 3% | `ebit_margin` |
 
-**Regra:** Verificar se o ROE é "real" ou inflado por alavancagem. Se debt/equity > 200% e ROE > 20%, desconfiar.
+**Regra:** Verificar se ROE é real ou inflado por alavancagem. Se debt_equity > 2 e ROE > 20%, desconfiar — o ROIC é mais confiável nesse caso.
 
-### Critério 3: Geração de Caixa — FCF (Peso 15%)
+**ROIC (Return on Invested Capital):** Melhor indicador de rentabilidade real. Mede o retorno sobre TODO o capital empregado (equity + dívida), eliminando o efeito da alavancagem. Buffett e Greenblatt usam ROIC como filtro principal. Disponível na bolsai via `roic`.
+
+### Critério 3: Qualidade dos Lucros — FCF & Earnings Yield (Peso 15%)
 
 "Owner earnings é o que importa — o dinheiro real que sobra." — Buffett
 
-| Indicador | O que mede | Ideal |
-|---|---|---|
-| FCF (Free Cash Flow) | Caixa gerado após capex | Positivo e crescente por 5 anos |
-| FCF Yield | FCF / Market Cap | > 5% |
-| FCF/Lucro Líquido | Qualidade do lucro | > 80% (lucro é caixa, não contábil) |
-| Capex/Receita | Intensidade de capital | < 15% (empresa leve) |
+| Indicador | 100 pts | 75 pts | 50 pts | 30 pts | 10 pts | Fonte |
+|---|---|---|---|---|---|---|
+| FCF Yield | > 10% | 5-10% | 2-5% | 0-2% | < 0% | Calculado: FCF / Market Cap |
+| Earnings Yield | > 12% | 8-12% | 5-8% | 3-5% | < 3% | Calculado: 1 / P/L |
+
+**Nota:** A bolsai não retorna FCF Yield e Earnings Yield diretamente. Calcular:
+- FCF Yield = não disponível via bolsai (seria necessário DFC raw). Quando ausente, assume 50 pts (neutro).
+- Earnings Yield = inverso do P/L. Se P/L = 10, EY = 10%. Se P/L = 5, EY = 20%.
 
 **Regra:** Se a empresa reporta lucro mas FCF é negativo por 3+ anos, é red flag. Lucro contábil pode ser manipulado; caixa não.
 
@@ -106,108 +115,52 @@ Analisar no mínimo 40 ativos distribuídos em:
 
 "Invista em empresas que pagam dividendos crescentes." — Barsi / Bazin
 
-| Indicador | Ideal | Bom | Ruim |
-|---|---|---|---|
-| Dividend Yield (12 meses) | > 6% | 3-6% | < 2% |
-| Payout Ratio | 30-60% | 20-80% | > 100% |
-| Consistência (anos pagando) | > 10 anos | 5-10 anos | < 3 anos |
-| Crescimento do dividendo | Crescente 5 anos | Estável | Decrescente |
+| Indicador | 100 pts | 85 pts | 65 pts | 40 pts | 20 pts | Fonte bolsai |
+|---|---|---|---|---|---|---|
+| DY TTM | > 8% | 6-8% | 4-6% | 2-4% | < 2% | `dividend_yield_ttm` (via `/dividends`) |
+| Payout | 30-60% | 20-80% | — | — | > 100% | Calculado: DY × P/L |
 
 **Regra Bazin:** DY > 6% nos últimos 12 meses. Se caiu abaixo de 6%, reavaliar.
 
-**Regra Barsi:** Não vender nunca. Reinvestir os dividendos. Olhar o yield on cost (DY sobre o preço que você pagou, não o preço atual).
+**Regra Barsi:** Não vender nunca. Reinvestir os dividendos. Olhar o yield on cost.
 
-**Cálculo do DY:** Somar todos os dividendos e JCP pagos nos últimos 12 meses, dividir pelo preço atual. Usar dados reais da brapi (dividendsData.cashDividends).
+**Cálculo do DY:** Usar `dividend_yield_ttm` da bolsai (endpoint `/dividends/{ticker}`) que soma todos os proventos (dividendos + JCP) dos últimos 12 meses e divide pelo preço.
 
 **Separação Dividendo vs JCP:**
-- **Dividendo** = isento de IR para pessoa física. O que entra na conta é líquido.
-- **JCP (Juros sobre Capital Próprio)** = 15% de IR retido na fonte. DY de 10% em JCP = 8.5% líquido.
-- Na brapi, o campo `label` em `cashDividends` indica: "DIVIDENDO" ou "JCP".
-- **Regra:** Ao comparar DY entre empresas, calcular o **DY líquido** (dividendo integral + JCP × 0.85). Preferir empresas que pagam mais em dividendo do que JCP.
+- **Dividendo** = isento de IR. O que entra na conta é líquido.
+- **JCP** = 15% de IR retido na fonte. DY de 10% em JCP = 8.5% líquido.
+- Na bolsai, o campo `type` em `payments` indica: `"Dividendo"` ou `"JCP"`.
+- **Regra:** Ao comparar, calcular DY líquido (dividendo integral + JCP × 0.85).
 
-### Critério 5: Endividamento e Solidez (Peso 10%)
+### Critério 5: Endividamento e Solidez (Peso 15%)
 
-| Indicador | Ideal | Bom | Perigoso |
-|---|---|---|---|
-| Dív. Líquida / EBITDA | < 1.5 | 1.5-3 | > 4 |
-| Dív. Líquida / PL | < 0.5 | 0.5-1.5 | > 2.5 |
-| Liquidez Corrente | > 2.0 | 1.2-2.0 | < 0.8 |
-| Cobertura de Juros | > 8x | 3-8x | < 1.5x |
-| **FCF / Dív. Total** | > 25% | 15-25% | < 10% |
+| Indicador | 100 pts | 80 pts | 55 pts | 30 pts | 10 pts | Fonte bolsai |
+|---|---|---|---|---|---|---|
+| Dív.Líq / EBITDA | < 1 ou negativo | 1-2 | 2-3 | 3-4 | > 4 | `net_debt_ebitda` |
+| Dív.Líq / PL | < 0.5 ou negativo | 0.5-1 | 1-2 | 2-3 | > 3 | `net_debt_equity` |
+| Liquidez Corrente | > 2.0 | 1.5-2.0 | 1.0-1.5 | 0.7-1.0 | < 0.7 | `current_ratio` |
 
-**Regra:** Empresa com Dív/EBITDA > 4 em cenário de SELIC alta (> 12%) é risco real de stress financeiro. Aplicar penalidade forte.
+**Regra:** Dív.Líq negativa (= caixa líquido) = 100 pts automático — a empresa tem mais caixa que dívida.
 
-**FCF / Dívida Total:** Indica quantos anos a empresa leva para quitar toda a dívida com caixa livre. FCF/Dív > 25% = quita em ~4 anos. FCF/Dív < 10% = levaria 10+ anos = perigoso. Este indicador diferencia empresas com dívida alta mas que geram caixa (aceitável) de empresas com dívida alta e caixa fraco (perigoso).
+**Regra SELIC:** Com SELIC > 12%, empresa com Dív/EBITDA > 4 paga juros pesados sobre a dívida. Penalizar fortemente.
 
 ### Critério 6: Crescimento (Peso 10%)
 
-| Indicador | Ideal | Bom | Ruim |
-|---|---|---|---|
-| Crescimento Receita 1a | > 15% | 5-15% | < -5% |
-| Crescimento Receita 5a (CAGR) | > 10% | 3-10% | < 0% |
-| Crescimento Lucro 1a | > 20% | 5-20% | < -10% |
-| Crescimento FCF 1a | > 15% | 0-15% | < 0% |
+| Indicador | 100 pts | 80 pts | 55 pts | 35 pts | 10 pts | Fonte bolsai |
+|---|---|---|---|---|---|---|
+| CAGR Receita 5 anos | > 20% | 10-20% | 5-10% | 0-5% | < 0% | `cagr_revenue_5y` |
+| CAGR Lucro 5 anos | > 25% | 15-25% | 5-15% | 0-5% | < 0% | `cagr_earnings_5y` |
 
-**Regra:** Crescimento passado não garante futuro, mas é o melhor preditor disponível. Preferir crescimento de receita (mais difícil de manipular) sobre crescimento de lucro.
+**Regra:** CAGR 5 anos é o melhor indicador de crescimento sustentável. Dados da bolsai calculados automaticamente a partir dos balanços CVM. Preferir CAGR receita (mais difícil de manipular) sobre CAGR lucro.
 
-### Critério 7: Consistência Histórica (Peso 5%)
+### Bônus/Penalidade: Piotroski F-Score e Altman Z-Score
 
-"Prefiro uma empresa com ROE de 15% por 10 anos do que uma com ROE de 40% por 1 ano." — Buffett
-
-| Verificação | Como medir | Fonte |
+| Score | Bônus | Fonte |
 |---|---|---|
-| Receita crescente 5 anos? | Comparar DRE anual 5 anos | brapi incomeStatementHistory |
-| Lucro líquido positivo 5 anos? | Sem prejuízo nos últimos 5 anos | brapi incomeStatementHistory |
-| FCF positivo 5 anos? | Fluxo de caixa livre positivo | brapi cashflowHistory |
-| Dividendo pago 5 anos? | Histórico de dividendos | brapi dividendsData |
-| ROE > 10% por 5 anos? | Financials históricos | brapi financialDataHistory |
-
-**Scoring de consistência:**
-- 5/5 anos positivos = 100 pontos
-- 4/5 = 80
-- 3/5 = 55
-- 2/5 = 30
-- 0-1/5 = 10
-
-### Critério 8: Moat — Vantagem Competitiva (Peso 5%)
-
-Qualitativo. Classificar manualmente:
-
-| Tipo de Moat | Exemplos | Score |
-|---|---|---|
-| **Marca forte** | WEG, Itaú, Ambev | Alto |
-| **Monopólio/Concessão** | Sabesp, Taesa, rodovias | Alto |
-| **Efeito de rede** | B3 (bolsa), bancos | Alto |
-| **Custo de troca alto** | Totvs (ERP), bancos | Médio-alto |
-| **Escala/Custo baixo** | Suzano, Vale | Médio |
-| **Regulatório** | Utilities, telecom | Médio |
-| **Sem moat claro** | Varejo, siderurgia | Baixo |
-
-**Regra:** Sem moat = precisa ser MUITO barata para justificar. Com moat forte = aceitar pagar um pouco mais.
-
-### Critério 9: Governança Corporativa (Bônus/Penalidade)
-
-| Fator | Bônus | Penalidade |
-|---|---|---|
-| Novo Mercado (B3) | +3 pontos | — |
-| Tag along 100% | +2 pontos | — |
-| Estatal (governo controlador) | — | -5 pontos |
-| Controlador com > 70% | — | -2 pontos |
-| Free float < 20% | — | -3 pontos |
-| Histórico de fraude/escândalo | — | -10 pontos |
-
-### Critério 10: Insider Activity e Consenso (Bônus/Penalidade)
-
-| Sinal | Bônus | Penalidade |
-|---|---|---|
-| Insiders comprando (últimos 3 meses) | +3 pontos | — |
-| Insiders vendendo significativamente | — | -3 pontos |
-| Consenso analistas: Strong Buy | +2 pontos | — |
-| Consenso analistas: Sell | — | -3 pontos |
-| Piotroski F-Score ≥ 7 | +4 pontos | — |
-| Piotroski F-Score ≤ 3 | — | -3 pontos |
-| Altman Z-Score > 2.99 | +3 pontos | — |
-| Altman Z-Score < 1.81 | — | -4 pontos |
+| Piotroski F-Score ≥ 7 | **+4 pontos** | FMP `/financial-scores` |
+| Piotroski F-Score ≤ 3 | **-3 pontos** | FMP |
+| Altman Z-Score > 2.99 | **+3 pontos** | FMP |
+| Altman Z-Score < 1.81 | **-4 pontos** | FMP |
 
 ---
 
@@ -215,19 +168,20 @@ Qualitativo. Classificar manualmente:
 
 ```
 Score Base = (
-    Valuation      × 0.20 +
-    Rentabilidade  × 0.20 +
-    FCF            × 0.15 +
-    Dividendos     × 0.15 +
-    Endividamento  × 0.10 +
-    Crescimento    × 0.10 +
-    Consistência   × 0.05 +
-    Moat           × 0.05
+    Valuation             × 0.20 +
+    Rentabilidade         × 0.20 +
+    FCF / Earnings Quality × 0.15 +
+    Dividendos            × 0.15 +
+    Endividamento         × 0.15 +
+    Crescimento           × 0.10 +
+    [remanescente 0.05 → neutro 50 pts]
 )
 
-Score Final = Score Base + Bônus Governança + Bônus Insider/Scores
+Score Final = Score Base + Bônus Piotroski + Bônus Altman Z
              (limitado entre 0 e 100)
 ```
+
+**Nota:** Os critérios qualitativos (Moat, Governança, Insiders) documentados abaixo NÃO entram no score automatizado. São avaliados manualmente na análise qualitativa (Fase 3 do processo) e influenciam a decisão final de compra, mas não o número do score.
 
 ### Classificação
 
@@ -235,9 +189,61 @@ Score Final = Score Base + Bônus Governança + Bônus Insider/Scores
 |---|---|---|
 | 80-100 | Excelente oportunidade | Comprar (alocar mais) |
 | 65-79 | Bom investimento | Comprar (alocação normal) |
-| 50-64 | Neutro | Watchlist — acompanhar |
+| 50-64 | Razoável | Watchlist — acompanhar |
 | 35-49 | Cautela | Evitar ou posição mínima |
 | 0-34 | Evitar | Não comprar |
+
+### Campos disponíveis na bolsai (referência completa)
+
+Todos retornados pelo endpoint `GET /fundamentals/{ticker}`:
+
+| Campo | Descrição | Usado no scoring? |
+|---|---|---|
+| `pl` | P/L (Preço/Lucro) | Sim — Valuation |
+| `pvp` | P/VP (Preço/Valor Patrimonial) | Sim — Valuation |
+| `ev_ebitda` | EV/EBITDA | Sim — Valuation |
+| `p_sr` | PSR (Preço/Receita) | Sim — Valuation |
+| `ev_ebit` | EV/EBIT | Exibido no site |
+| `p_ebitda` | Preço/EBITDA | Exibido no site |
+| `p_ebit` | Preço/EBIT | Exibido no site |
+| `p_assets` | Preço/Ativos | Exibido no site |
+| `lpa` | Lucro por Ação | Exibido no site |
+| `vpa` | Valor Patrimonial por Ação | Exibido no site |
+| `roe` | Return on Equity | Sim — Rentabilidade |
+| `roa` | Return on Assets | Exibido no site |
+| `roic` | Return on Invested Capital | Sim — Rentabilidade |
+| `net_margin` | Margem Líquida | Sim — Rentabilidade |
+| `gross_margin` | Margem Bruta | Sim — Rentabilidade |
+| `ebitda_margin` | Margem EBITDA | Exibido no site |
+| `ebit_margin` | Margem EBIT/Operacional | Sim — Rentabilidade |
+| `debt_equity` | Dívida/PL | Exibido no site |
+| `net_debt_equity` | Dív.Líquida/PL | Sim — Endividamento |
+| `net_debt_ebitda` | Dív.Líquida/EBITDA | Sim — Endividamento |
+| `net_debt_ebit` | Dív.Líquida/EBIT | Exibido no site |
+| `current_ratio` | Liquidez Corrente | Sim — Endividamento |
+| `asset_turnover` | Giro do Ativo | Exibido no site |
+| `ebit_over_assets` | EBIT/Ativos | Exibido no site |
+| `cagr_revenue_5y` | CAGR Receita 5 anos | Sim — Crescimento |
+| `cagr_earnings_5y` | CAGR Lucro 5 anos | Sim — Crescimento |
+| `dividend_yield_ttm` | DY TTM (via `/dividends`) | Sim — Dividendos |
+
+### Critérios Qualitativos (avaliação manual)
+
+Estes critérios NÃO entram no score numérico mas são analisados na Fase 3 e podem **vetar** ou **reforçar** a decisão de compra.
+
+**Moat (Vantagem Competitiva):**
+
+| Tipo | Exemplos | Força |
+|---|---|---|
+| Marca forte | WEG, Itaú, Ambev | Alta |
+| Monopólio/Concessão | Sabesp, Taesa | Muito Alta |
+| Custo de troca | Totvs, bancos | Média-Alta |
+| Escala/Custo baixo | Suzano, Vale | Média |
+| Sem moat claro | Varejo, siderurgia | Baixa |
+
+**Governança:** Novo Mercado (+), estatal (-), tag along, free float.
+
+**Insiders:** FMP `/insider-trading` — diretores comprando = sinal positivo.
 
 ---
 
@@ -260,18 +266,18 @@ FIIs não são empresas. Não têm DRE, não têm ROE, não têm margem líquida
 
 ### 6.2 Indicadores para FIIs
 
-#### Indicadores disponíveis via API (brapi)
+#### Indicadores disponíveis via API (bolsai)
 
-| Indicador | Como obter | Benchmarks |
+| Indicador | Endpoint bolsai | Benchmarks |
 |---|---|---|
-| **Dividend Yield 12m** | Somar cashDividends dos últimos 12 meses / preço | Papel: > 10% bom. Tijolo: > 7% bom |
-| **P/VP** | defaultKeyStatistics.priceToBook | < 0.95 = desconto. 0.95-1.05 = justo. > 1.10 = prêmio |
-| **Valor Patrimonial/cota** | defaultKeyStatistics.bookValue | Referência para P/VP |
-| **Dividendo mensal médio** | Total 12m / 12 | Estabilidade mês a mês |
-| **Consistência de pagamento** | Contar anos pagando (2019+) | > 5 anos = consistente |
-| **Tendência do dividendo** | Comparar 1a metade vs 2a metade do histórico | Crescente = bom |
-| **Volume diário** | regularMarketVolume | > 50.000 = liquidez OK |
-| **52 semanas alta/baixa** | fiftyTwoWeekHigh/Low | Proximidade da mínima = oportunidade |
+| **Dividend Yield TTM** | `GET /fiis/{ticker}` → `dividend_yield_ttm` | Papel: > 10% bom. Tijolo: > 7% bom |
+| **P/VP** | `GET /fiis/{ticker}` → `pvp` | < 0.95 = desconto. 0.95-1.05 = justo. > 1.10 = prêmio |
+| **VPA (Valor Patrimonial/cota)** | `GET /fiis/{ticker}` → `book_value_per_share` | Referência para P/VP |
+| **NAV (Patrimônio Líquido)** | `GET /fiis/{ticker}` → `net_asset_value` | Tamanho do fundo |
+| **Nº Cotistas** | `GET /fiis/{ticker}` → `total_shareholders` | > 50k = base sólida |
+| **Distribuições mensais** | `GET /fiis/{ticker}/distributions` → `payments` | R$/cota, dy_month_pct |
+| **Histórico mensal P/VP/DY** | `GET /fiis/{ticker}/history` | Tendência de P/VP e DY |
+| **Segmento / Tipo de Gestão** | `GET /fiis/{ticker}` → `segment`, `management_type` | Classificação do fundo |
 
 #### Indicadores NÃO disponíveis via API (só no relatório gerencial mensal)
 
@@ -337,18 +343,12 @@ Score FII = (
 
 | Fonte | O que fornece | Tipo | Custo |
 |---|---|---|---|
-| **brapi.dev** | Cotação, P/VP, dividendos históricos, book value | API | Já contratada (Premium) |
-| **Dados de Mercado** (dadosdemercado.com.br) | Lista de FIIs, dividendos, setor, CNPJ | API REST | Pago (tem free tier) |
-| **Funds Explorer** (fundsexplorer.com.br) | Vacância, DY, P/VP, cap rate, relatórios | Site (sem API oficial) | Gratuito (web) |
-| **Status Invest** (statusinvest.com.br) | Indicadores completos, histórico | Site (sem API oficial) | Gratuito (web) |
-| **Bianco Valuations** (biancovaluations.com) | Screening 400+ FIIs, vacância, cap rate, valuation (DDM, Bazin) | Site | Pago |
-| **BrFiis** (brfiis.com.br) | Relatórios gerenciais, documentos CVM | Site | Gratuito |
-| **CVM/Fnet** (fnet.bmfbovespa.com.br) | Relatórios gerenciais oficiais (PDF) | Site governo | Gratuito |
+| **bolsai** (`usebolsai.com`) | P/VP, DY TTM, NAV, cotistas, distribuições mensais, histórico | API Pro | R$ 29/mês (já contratada) |
+| **brapi.dev** | Cotação em tempo real, volume | API Premium | Já contratada |
+| **Funds Explorer** | Vacância, cap rate, relatórios gerenciais | Site (sem API) | Gratuito |
+| **CVM/Fnet** | Relatórios gerenciais oficiais (PDF) | Site governo | Gratuito |
 
-**Nota:** Nenhuma API pública fornece vacância, cap rate ou inadimplência programaticamente. Esses dados existem apenas nos relatórios gerenciais mensais (PDFs) ou em plataformas pagas como Bianco Valuations. Para integração futura, seria necessário:
-- Scraping de Funds Explorer ou Status Invest (frágil, pode quebrar)
-- Assinatura do Bianco Valuations (se tiver API)
-- Parser de PDFs dos relatórios gerenciais via CVM/Fnet (complexo)
+**Nota:** Vacância, cap rate e inadimplência NÃO estão disponíveis via API. Existem apenas nos relatórios gerenciais mensais (PDFs na CVM).
 
 ---
 
@@ -501,14 +501,18 @@ A análise deve considerar o cenário macroeconômico:
 ## 10. Processo de Análise (Passo a Passo)
 
 ### Fase 1: Coleta (automatizada)
-1. Puxar cotações e fundamentalistas via brapi (batch 20)
-2. Puxar dados complementares via FMP (scores, DCF, insiders)
-3. Puxar macro: SELIC, IPCA, câmbio
+1. Puxar fundamentos de ações BR via **bolsai** `/fundamentals/{ticker}` (27 indicadores CVM)
+2. Puxar dividendos via **bolsai** `/dividends/{ticker}` (DY TTM + JCP split)
+3. Puxar cotação em tempo real via **brapi** `/quote/{ticker}`
+4. Puxar FIIs via **bolsai** `/fiis/{ticker}` + `/fiis/{ticker}/distributions`
+5. Puxar dados US via **FMP** (profile + ratios + DCF + scores)
+6. Puxar macro via **bolsai** `/macro/selic_target`, `/macro/ipca`, `/macro/usd_brl`
 
 ### Fase 2: Screening quantitativo
-4. Calcular score de cada dimensão (Critérios 1-7)
-5. Aplicar bônus/penalidades (Critérios 9-10)
-6. Ranquear por score final
+7. Calcular score de cada dimensão (6 critérios: val/prof/fcf/div/debt/growth)
+8. Aplicar bônus Piotroski/Altman Z
+9. Ranquear por score final
+10. Usar **bolsai screener** (`GET /screener?roe_gt=10&pl_lt=15`) para descobrir ativos adicionais
 
 ### Fase 3: Análise qualitativa
 7. Avaliar moat de cada empresa (Critério 8)
