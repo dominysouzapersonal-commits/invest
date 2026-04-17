@@ -108,16 +108,20 @@ export default function AssetDetailPage() {
               </div>
             ))}
           </div>
-          {Object.entries(score.details).map(([cat, metrics]) => (
+          {Object.entries(score.details)
+            .filter(([cat]) => !['weights_used', 'pillar_scores', 'advanced'].includes(cat))
+            .map(([cat, metrics]) => (
             <div key={cat} className="mb-4">
-              <p className="text-[11px] text-text-muted mb-2 capitalize">{cat}</p>
+              <p className="text-[11px] text-text-muted mb-2 capitalize">{cat.replace(/_/g, ' ')}</p>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-x-6">
-                {Object.entries(metrics).map(([n, m]) => (
+                {Object.entries(metrics as Record<string, any>)
+                  .filter(([, m]) => m && typeof m === 'object' && 'score' in m)
+                  .map(([n, m]) => (
                   <div key={n} className="flex items-center justify-between py-1.5 border-b border-border/40">
                     <span className="text-[11px] text-text-muted">{n}</span>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs text-text-primary tabular-nums">{typeof m.value === 'number' ? m.value.toFixed(2) : m.value}</span>
-                      <span className={`text-[9px] tabular-nums ${m.score >= 65 ? 'text-gain' : m.score >= 40 ? 'text-text-muted' : 'text-loss'}`}>{m.score.toFixed(0)}</span>
+                      <span className={`text-[9px] tabular-nums ${m.score >= 65 ? 'text-gain' : m.score >= 40 ? 'text-text-muted' : 'text-loss'}`}>{Math.round(m.score)}</span>
                     </div>
                   </div>
                 ))}
