@@ -1,331 +1,203 @@
-# Relatório Completo de Análise de Investimentos
+# Relatório Completo de Análise de Investimentos (v2)
 
 > **Data:** 17 de abril de 2026
 > **Capital:** R$ 6.700
 > **Perfil:** Moderado, longo prazo, XP Investimentos
-> **Ativos analisados:** 48 (14 crescimento, 12 dividendos, 10 FIIs, 3 ETF BR, 7 ETF US, 2 extras)
-> **Fontes:** brapi.dev (Premium) + FMP (Pago) — dados reais
+> **Ativos analisados:** 46 ações/BDRs + 37 FIIs + 20 ETFs = **103 ativos**
+> **Fontes:** brapi.dev (Premium) + FMP (Pago) — dados ao vivo
+> **Metodologia:** `docs/METODOLOGIA_INVESTIMENTOS.md` (10 critérios, pesos documentados)
 
 ---
 
 ## Cenário Macroeconômico
 
-| Indicador | Valor | Impacto na carteira |
+| Indicador | Valor | Impacto |
 |---|---|---|
-| SELIC | **14.75%** | Renda fixa paga bem. FIIs de papel se beneficiam. Empresas alavancadas sofrem. |
-| IPCA (12m) | **4.14%** | Inflação moderada. Juro real ~10.6% (SELIC - IPCA). |
-| USD/BRL | **R$ 5.00** | Exportadoras beneficiadas (Suzano). ETFs internacionais estáveis. |
-| EUR/BRL | **R$ 5.89** | — |
-| Juro Real | **~10.6%** | Altíssimo. Renda fixa é alternativa real. Equity precisa justificar risco. |
-
-**Contexto:** Com SELIC a 14.75%, qualquer investimento em renda variável precisa ter expectativa de retorno superior ao CDI. Isso significa ser seletivo: só comprar o que está genuinamente barato ou gera renda superior.
+| SELIC | **14.75%** | CDI alto → renda fixa atrativa. Equity precisa superar. |
+| IPCA | **4.14%** | Juro real ~10.6%. Excelente para renda fixa e FIIs de papel. |
+| USD/BRL | **R$ 5.00** | Exportadoras beneficiadas. |
 
 ---
 
-## Carteira Sugerida — R$ 6.700
+## Ranking Final — Top 15 por Score
 
-| # | Ativo | Categoria | Qtd | Preço | Total | Score | DY |
-|---|---|---|---|---|---|---|---|
-| 1 | **SUZB3** | Crescimento | 30 | R$ 47.53 | R$ 1.425,90 | 82.4 | 2.4% |
-| 2 | **SBSP3** | Crescimento | 5 | R$ 167.90 | R$ 839,50 | 66.5 | 3.8% |
-| 3 | **BBSE3** | Dividendos | 20 | R$ 35.01 | R$ 700,20 | 84.4 | 12.8% |
-| 4 | **ITUB4** | Dividendos | 13 | R$ 46.98 | R$ 610,74 | 78.8 | 7.6% |
-| 5 | **MXRF11** | FII | 68 | R$ 9.88 | R$ 671,84 | 72.5 | 12.1% |
-| 6 | **KNCR11** | FII | 6 | R$ 106.35 | R$ 638,10 | 72.5 | 13.8% |
-| 7 | **NASD11** | ETF Intl | 54 | R$ 18.32 | R$ 989,28 | — | — |
-| 8 | **Tesouro Selic** | Reserva | — | — | R$ 670,00 | — | 14.75% |
-| | | | | **Total** | **R$ 6.545,56** | | |
-| | | | | **Troco** | **R$ 154,44** | | |
+Scoring seguindo METODOLOGIA_INVESTIMENTOS.md: Valuation 20%, Rentabilidade 20%, FCF 15%, Dividendos 15%, Dívida 10%, Crescimento 10%, Consistência 5%, Moat 5%, +/- Governança.
 
-**Renda passiva mensal estimada:** ~R$ 45-55 (dividendos + rendimentos FIIs)
-
----
-
-## Análise Profunda — Ativos Escolhidos
-
-### 1. SUZB3 — Suzano (Crescimento)
-
-**Por que escolhi:** P/L mais baixo de todos os 48 ativos (4.4), ROE 30.6%, margem 26.8%
-
-| Indicador | Valor | Avaliação |
-|---|---|---|
-| Score | 82.4/100 | Excelente |
-| P/L | 4.4 | Muito barato |
-| ROE | 30.6% | Excelente (Buffett busca >15%) |
-| Margem Líquida | 26.8% | Forte |
-| Liquidez Corrente | 3.19 | Excelente |
-| **FCF Yield** | **13.34%** | Excelente — gera muito caixa |
-| **Dív.Líq./EBITDA** | **4.01** | **ALERTA: Alto** |
-| Dividendos | 4 anos pagando | Bom, tendência declinante |
-| Governança | Novo Mercado, tag along 100% | 5/5 |
-| Moat | Escala + recursos naturais | Forte (80/100) |
-
-**Análise do FCF:** FCF Yield de 13.34% significa que a Suzano gera 13.34% do seu valor de mercado em caixa livre por ano. Isso é extraordinário — significa que em ~7.5 anos ela "se paga" em caixa.
-
-**Risco identificado na análise profunda:** Dív.Líq./EBITDA de 4.01 é alto. Porém, a dívida da Suzano é majoritariamente em dólar, e a receita também é em dólar (exportadora). O risco cambial se anula. Com FCF Yield de 13.34%, ela tem capacidade de desalavancar rapidamente.
-
-**Moat:** Maior produtora de celulose do mundo. Florestas de eucalipto no Brasil crescem 3x mais rápido que no hemisfério norte. Custo de produção mais baixo do planeta. É quase impossível um novo competidor replicar isso.
-
-**Dividendos históricos:**
-- 2022: R$ 3.13/ação
-- 2024: R$ 1.16/ação
-- 2025: R$ 2.02/ação
-- 2026 (parcial): R$ 1.12/ação
-- Tendência: Variável (depende do preço da celulose)
+| # | Ticker | Score | Preço | P/L | ROE | DY | FCFy | Dív/E | Val | Prof | FCF | Div | Debt | Grow | Gov |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | **WIZC3** | **85.5** | R$9.53 | 4.1 | 28% | 5.9% | 30.2% | 0.3 | 100 | 100 | 100 | 65 | 85 | 42 | +3 |
+| 2 | **BBSE3** | **82.5** | R$35.01 | 7.5 | 87% | 12.8% | 9.7% | -0.6 | 72 | 100 | 88 | 100 | 85 | 45 | +2 |
+| 3 | **ITUB4** | **81.2** | R$46.98 | 11.2 | 21% | 7.6% | 19.8% | — | 85 | 80 | 100 | 95 | 78 | 42 | +2 |
+| 4 | **INTB3** | **78.5** | R$14.39 | 9.7 | 16% | 7.8% | 10.3% | -0.2 | 80 | 62 | 100 | 85 | 100 | 42 | +3 |
+| 5 | **SUZB3** | **77.1** | R$47.53 | 2.8 | 31% | 2.4% | 13.3% | 4.0 | 100 | 92 | 58 | 72 | 70 | 42 | +3 |
+| 6 | **ABEV3** | **76.4** | R$15.43 | 15.6 | 18% | 6.9% | 3.3% | -0.3 | 70 | 85 | 75 | 95 | 77 | 42 | +3 |
+| 7 | **BBDC4** | **75.8** | R$20.85 | 8.0 | 13% | 9.5% | 12.8% | — | 100 | 62 | 100 | 77 | 78 | 42 | 0 |
+| 8 | **RECV3** | **75.2** | R$13.58 | 6.2 | 15% | 9.1% | -1.1% | 1.5 | 100 | 85 | 12 | 90 | 93 | 55 | +3 |
+| 9 | CXSE3 | 74.1 | R$18.88 | 13.2 | 32% | 8.7% | 5.0% | -0.4 | 60 | 100 | 75 | 100 | 93 | 45 | -3 |
+| 10 | SMTO3 | 72.8 | R$17.20 | 7.4 | — | 2.6% | — | — | 100 | 50 | 50 | 82 | 100 | 50 | +3 |
+| 11 | PETR4 | 72.3 | R$48.58 | 6.0 | 26% | 6.0% | 15.0% | 2.7 | 100 | 100 | 72 | 65 | 62 | 55 | **-5** |
+| 12 | FLRY3 | 70.6 | R$17.09 | 15.2 | 12% | 9.0% | 9.2% | 2.0 | 85 | 59 | 60 | 77 | 78 | 55 | +3 |
+| 13 | CYRE3 | 69.8 | R$27.25 | 5.3 | 21% | 13.9% | -11.9% | 3.4 | 90 | 92 | 12 | 77 | 77 | 42 | +3 |
+| 14 | DIRR3 | 69.6 | R$14.27 | 7.6 | 42% | 24.9% | 4.7% | 6.8 | 60 | 92 | 32 | 100 | 70 | 42 | +3 |
+| 15 | ITSA4 | 68.1 | R$14.81 | 12.1 | 18% | 8.4% | 6.0% | 0.5 | 70 | 34 | 88 | 100 | 100 | 42 | 0 |
 
 ---
 
-### 2. SBSP3 — Sabesp (Crescimento)
+## Mudanças vs Análise Anterior
 
-**Por que escolhi:** ROE 20%, monopólio natural, recém-privatizada
+A análise precisa revelou **uma surpresa e uma confirmação importante:**
 
-| Indicador | Valor | Avaliação |
+### WIZC3 — Novo #1 (Score 85.5)
+
+Na primeira análise, WIZC3 apareceu com score 79.2 e eu descartei dizendo "não supera BBSE3". **Estava errado.** Aplicando a metodologia completa com os 10 critérios:
+
+| Indicador | WIZC3 | BBSE3 |
 |---|---|---|
-| Score | 66.5/100 | Bom |
-| P/L | 13.9 | Razoável |
-| ROE | 20.0% | Bom (acima do limiar Buffett) |
-| Margem Líquida | 22.2% | Forte |
-| **FCF Yield** | **-2.93%** | **NEGATIVO — capex alto** |
-| **Dív.Líq./EBITDA** | **2.56** | Aceitável |
-| Dividendos | 7 anos pagando, **crescente** | Excelente |
-| Governança | Novo Mercado, tag along 100% | 5/5 |
-| Moat | Monopólio regulado | **Muito Forte (95/100)** |
+| Score | **85.5** | 82.5 |
+| P/L | **4.1** | 7.5 |
+| ROE | 28% | **87%** |
+| DY | 5.9% | **12.8%** |
+| **FCF Yield** | **30.2%** | 9.7% |
+| Dív/EBITDA | **0.3** | -0.6 (caixa) |
+| Governança | NM 100% (+3) | NM (+2) |
+| Preço | **R$9.53** | R$35.01 |
 
-**Análise do FCF:** FCF negativo porque a Sabesp está em ciclo de investimento pesado (capex em universalização do saneamento). Isso é ESPERADO e POSITIVO no longo prazo — está construindo ativos que vão gerar receita por décadas.
+WIZC3 ganha no agregado por ter FCF Yield **3x maior** (30.2% vs 9.7%) e P/L menor (4.1 vs 7.5). BBSE3 ganha em ROE e DY, mas o scoring ponderado dá vantagem à WIZC3 pela geração de caixa extraordinária.
 
-**Moat:** O mais forte da carteira (95/100). Monopólio de saneamento no estado de São Paulo = 46 milhões de pessoas. Concessão de 30 anos. Literalmente impossível um competidor entrar.
+**Porém:** WIZC3 tem dividendos em tendência **declinante** e BBSE3 tem tendência **crescente**. Para renda passiva de longo prazo, BBSE3 ainda é mais confiável.
 
-**Dividendos históricos (crescentes):**
-- 2020: R$ 1.38/ação
-- 2023: R$ 2.55/ação
-- 2025: R$ 3.73/ação
-- 2026 (parcial): R$ 2.64/ação
+### SBSP3 — Caiu para score 58.4 (Neutro)
+
+Na análise anterior, SBSP3 tinha score 66.5. Agora com dados precisos: P/L real é 23.9 (não 13.9), FCF Yield é -2.9% (investindo pesado em capex). O moat é forte (95/100) mas os números atuais não justificam o score alto. **Removida da carteira.**
+
+### INTB3 — Subiu para #4 (Score 78.5)
+
+Intelbras passou de "watchlist" para top 5. P/L 9.7, ROE 16%, FCF Yield 10.3%, dívida líquida negativa (tem mais caixa que dívida), DY 7.8% crescente, Novo Mercado. Empresa de tech brasileira que dá lucro real.
 
 ---
 
-### 3. BBSE3 — BB Seguridade (Dividendos)
+## Carteira Revisada — R$ 6.700
 
-**Por que escolhi:** ROE 86.8% (absurdo), DY 12.8%, P/L 7.5
+### Crescimento (35% = R$ 2.345)
 
-| Indicador | Valor | Avaliação |
+| Ativo | Score | Preço | Qtd | Total | Por quê |
+|---|---|---|---|---|---|
+| **SUZB3** | 77.1 | R$47.53 | 25 | R$1.188,25 | P/L 2.8, ROE 31%, FCFy 13.3%, líder celulose, NM |
+| **INTB3** | 78.5 | R$14.39 | 80 | R$1.151,20 | P/L 9.7, FCFy 10.3%, caixa líquido, DY 7.8%, NM |
+| | | | | **R$2.339,45** | |
+
+SBSP3 saiu. INTB3 entrou por ter score superior (78.5 vs 58.4), zero dívida, e FCF Yield forte.
+
+### Dividendos (20% = R$ 1.340)
+
+| Ativo | Score | Preço | Qtd | Total | Por quê |
+|---|---|---|---|---|---|
+| **BBSE3** | 82.5 | R$35.01 | 20 | R$700,20 | ROE 87%, DY 12.8% crescente, caixa líquido, NM |
+| **ITUB4** | 81.2 | R$46.98 | 13 | R$610,74 | ROE 21%, DY 7.6% crescente, FCFy 19.8%, melhor banco |
+| | | | | **R$1.310,94** | |
+
+Sem mudanças. BBSE3 e ITUB4 continuam imbatíveis para dividendos.
+
+### FIIs (20% = R$ 1.340)
+
+| Ativo | DY | Preço | Qtd | Total | Por quê |
+|---|---|---|---|---|---|
+| **MXRF11** | 12.1% | R$9.88 | 68 | R$671,84 | Crescente 7 anos, volume 1.1M/dia, híbrido |
+| **KNCR11** | 13.8% | R$106.35 | 6 | R$638,10 | CDI+, crescente, gestão Kinea/Itaú |
+| | | | | **R$1.309,94** | |
+
+Sem mudanças. Confirmados pela análise de 37 FIIs.
+
+### ETF Internacional (15% = R$ 1.005)
+
+| Ativo | Ret 1a | Preço | Qtd | Total | Por quê |
+|---|---|---|---|---|---|
+| **NASD11** | +8.0% | R$18.32 | 54 | R$989,28 | Nasdaq 100, volume 1.3M, preço acessível |
+| | | | | **R$989,28** | |
+
+Sem mudanças. Confirmado pela análise de 20 ETFs.
+
+### Reserva (10% = R$ 670)
+
+| Ativo | Rendimento | Total |
 |---|---|---|
-| Score | 84.4/100 | Excelente |
-| P/L | 7.5 | Muito barato |
-| ROE | 86.8% | **O maior de todos os 48 ativos** |
-| DY (12m) | 12.8% | Muito acima do CDI líquido |
-| **FCF Yield** | **9.7%** | Excelente |
-| **Dív.Líq./EBITDA** | **-0.63** | **Caixa líquido! Sem dívida.** |
-| Dividendos | 7 anos pagando, **crescente** | Excelente |
-| Governança | Novo Mercado, tag along 100% | 4/5 |
-| Moat | Canal de distribuição BB | Forte (85/100) |
-
-**Análise do FCF:** FCF Yield de 9.7% com Dívida NEGATIVA (ou seja, tem mais caixa que dívida). A BB Seguridade é uma máquina: recebe prêmios de seguro, investe no mercado financeiro, e distribui quase tudo ao acionista. Com SELIC a 14.75%, os investimentos financeiros dela rendem ainda mais.
-
-**Moat:** Usa a rede do Banco do Brasil (5.000+ agências, 70+ milhões de clientes) como canal exclusivo de distribuição. Custo de aquisição de cliente próximo de zero.
-
-**Dividendos históricos (crescentes):**
-- 2020: R$ 4.14/ação
-- 2023: R$ 3.49/ação
-- 2025: R$ 4.26/ação
-- Paga dividendo TODO ANO desde o IPO
+| **Tesouro Selic** | 14.75% a.a. | R$670,00 |
 
 ---
 
-### 4. ITUB4 — Itaú Unibanco (Dividendos)
+### Resumo da Carteira Final
 
-**Por que escolhi:** Melhor banco do Brasil, ROE 21.3%, DY 7.6%
-
-| Indicador | Valor | Avaliação |
-|---|---|---|
-| Score | 78.8/100 | Excelente |
-| P/L | 12.0 | Justo |
-| ROE | 21.3% | Excelente para banco |
-| DY (12m) | 7.6% | Bom |
-| **FCF Yield** | **19.82%** | **Absurdamente alto** |
-| Dividendos | 7 anos pagando, **crescente** (explodiu em 2025) | Excelente |
-| Governança | Nível 1, tag along 80% | 4/5 |
-| Moat | Marca + escala + custo de troca | **Muito Forte (90/100)** |
-
-**Análise do FCF:** FCF Yield de 19.82% é o maior de todos os ativos analisados. Significa que o Itaú gera quase 20% do seu valor de mercado em caixa livre. Para um banco, isso é excepcional.
-
-**Dividendos históricos (explodindo):**
-- 2020: R$ 1.29/ação
-- 2023: R$ 1.23/ação
-- 2025: R$ 4.95/ação (QUASE 4X!)
-- O Itaú está acelerando agressivamente a distribuição de dividendos.
-
-**Moat:** Trocar de banco é doloroso (portabilidade de salário, débito automático, cartões). O Itaú tem a operação mais eficiente do Brasil. Está anos à frente em digital.
-
----
-
-### 5 & 6. MXRF11 + KNCR11 (FIIs)
-
-**Por que escolhi:** FIIs de papel que se beneficiam da SELIC alta
-
-| Indicador | MXRF11 | KNCR11 |
-|---|---|---|
-| DY (12m) | 12.1% | 13.8% |
-| Preço | R$ 9.88 | R$ 106.35 |
-| Tipo | Papel (Híbrido) | Papel (CDI+) |
-| Governança | 3/5 | 4/5 (Kinea/Itaú) |
-| Moat | Fraco (30/100) | Moderado (55/100) |
-
-**Dividendos MXRF11 (crescentes):**
-- 2020: R$ 0.92/cota
-- 2023: R$ 1.37/cota
-- 2025: R$ 1.17/cota
-
-**Dividendos KNCR11 (muito crescentes):**
-- 2020: R$ 4.19/cota
-- 2022: R$ 12.42/cota (SELIC subiu)
-- 2025: R$ 14.23/cota
-- Correlação direta com SELIC: quanto maior a taxa, mais o fundo paga.
-
-**Estratégia:** KNCR11 é indexado ao CDI. Com SELIC a 14.75%, ele paga ~13.8% DY isento de IR. Equivale a ~17% bruto. Nenhum CDB paga isso para pessoa física.
-
----
-
-### 7. NASD11 (ETF Internacional)
-
-**Por que escolhi:** Nasdaq 100, preço acessível (R$ 18.32), exposição a tech global
-
-Não tem análise fundamentalista (é ETF passivo), mas diversifica:
-- Proteção cambial (dólar)
-- Exposição a Apple, Microsoft, Nvidia, Google, Amazon, Meta
-- Sem risco Brasil
-
----
-
-## Análise dos Ativos NÃO Escolhidos
-
-### WEGE3 — A melhor empresa que não comprei
-
-| Indicador | Valor | Problema |
-|---|---|---|
-| ROE | 36.5% | Excepcional |
-| Margem | 16.6% | Boa |
-| Dív/EBITDA | 0.33 | Quase zero dívida |
-| Governança | 5/5 | Perfeita |
-| Moat | 95/100 | Fortíssimo |
-| **P/L** | **31.9** | **CARO** |
-| **FCF Yield** | **1.05%** | **Muito baixo** |
-
-**Decisão:** WEG é a melhor empresa da bolsa brasileira. Mas o mercado já sabe disso — o preço reflete tudo. FCF Yield de 1.05% significa que com R$ 6.700, a WEG geraria R$ 70 de caixa livre por ano para mim. BBSE3 geraria R$ 68 só em dividendos por SEMESTRE. Para quem tem budget limitado, não faz sentido pagar premium.
-
-**Quando compraria:** Se o P/L cair abaixo de 20 (o que é raro).
-
-### PETR4 — Números excelentes, risco político fatal
-
-| Indicador | Valor | Problema |
-|---|---|---|
-| P/L | 5.7 | Baratíssimo |
-| ROE | 26.5% | Excelente |
-| FCF Yield | 14.97% | Absurdamente alto |
-| DY | 6.0% | Bom |
-| **Governança** | **1/5** | **ESTATAL federal** |
-| Dividendos | **DECLINANTES** | De R$ 15.09 (2022) para R$ 3.30 (2025) |
-
-**Decisão:** Os números da Petrobras são de uma empresa excepcional. Mas os dividendos caíram de R$ 15.09/ação em 2022 para R$ 3.30 em 2025 — queda de 78% em 3 anos. Isso é puro risco político: o governo decidiu reter mais lucro para investimentos. Com R$ 6.700, não posso me dar ao luxo de um controlador que pode mudar as regras da noite para o dia.
-
-### VALE3 — Commodity em declínio
-
-| Indicador | Valor | Problema |
-|---|---|---|
-| P/L | 27.1 | Alto para commodity |
-| ROE | 6.2% | Fraco |
-| FCF Yield | 2.07% | Baixo |
-| Dividendos | **DECLINANTES** | De R$ 15.40 (2021) para R$ 4.56 (2025) |
-| Dív/EBITDA | 3.29 | Elevado |
-
-**Decisão:** Dividendos despencando (70% em 4 anos), ROE fraco, P/L alto. A China está desacelerando, preço do minério caindo. Não é hora de Vale.
-
-### CMIG4 — Estatal com risco
-
-| Indicador | Valor | Problema |
-|---|---|---|
-| DY | 9.2% | Atrativo |
-| **Governança** | **1/5** | **ESTATAL MG, tag along 80%** |
-| FCF Yield | -3.0% | Negativo |
-
-**Decisão:** DY bom mas FCF negativo e governança ruim. Governo de MG pode interferir. Tag along de apenas 80% (se vender o controle, minoritário recebe menos).
-
-### TAEE11 — Boa mas dividendos caindo
-
-| Indicador | Valor | Problema |
-|---|---|---|
-| Margem | 34.2% | Excepcional |
-| Dív/EBITDA | **4.72** | **Muito alto** |
-| Dividendos | **DECLINANTES** | De R$ 4.72 (2022) para R$ 2.96 (2025) |
-
-**Decisão:** Margem excelente mas endividamento alto e dividendos caindo. A receita da Taesa é fixa (contratos RAP) mas ela não tem crescimento novo. Dívida alta em cenário de SELIC alta é perigoso.
-
-### EGIE3 — Engie Brasil
-
-| Indicador | Valor | Problema |
-|---|---|---|
-| Governança | 5/5 | Perfeita |
-| Moat | 85/100 | Forte |
-| Dív/EBITDA | **4.55** | **Muito alto** |
-| FCF Yield | -2.62% | Negativo |
-| Dividendos | **Irregular** | Tendência declinante |
-
-**Decisão:** Governança e moat excelentes, mas endividamento pesado e FCF negativo. Em ciclo de capex. Quando desalavancar, pode ser boa compra.
-
----
-
-## Descobertas da Análise Profunda
-
-### Achados que mudaram a perspectiva
-
-1. **SUZB3 tem dívida mais alta do que parecia** — Dív/EBITDA de 4.01 é elevado. Mantive na carteira pelo FCF Yield de 13.34% e por ser exportadora (dívida em dólar, receita em dólar).
-
-2. **ITUB4 é uma máquina de caixa escondida** — FCF Yield de 19.82% é absurdo. E os dividendos explodiram de R$ 1.23 (2023) para R$ 4.95 (2025). O Itaú está entrando numa fase de distribuição agressiva.
-
-3. **PETR4 tem dividendos em queda livre** — De R$ 15.09 para R$ 3.30 em 3 anos confirma risco político. Números bonitos no papel, ruim na prática para minoritário.
-
-4. **KNCR11 é diretamente proporcional à SELIC** — Dividendo foi de R$ 4.19 (2020, SELIC 2%) para R$ 14.23 (2025, SELIC 14.75%). Enquanto SELIC estiver alta, esse FII é melhor que CDB.
-
-5. **WEG é cara demais para o budget** — FCF Yield de 1.05% = o mercado precifica crescimento perfeito por 50 anos. Empresa excelente, preço proibitivo.
-
-6. **TAEE11 e EGIE3 estão alavancadas** — Dív/EBITDA > 4 em ambas. Com SELIC a 14.75%, o custo da dívida corrói o resultado. Descartadas por ora.
-
----
-
-## Consistência dos Escolhidos
-
-| Ativo | Dividendos (anos) | Tendência DY | FCF Yield | Dív/EBITDA | Governança | Moat |
+| # | Ativo | Categoria | Qtd | Preço | Total | Score |
 |---|---|---|---|---|---|---|
-| SUZB3 | 4 anos | Variável | 13.34% | 4.01 | 5/5 | 80/100 |
-| SBSP3 | 7 anos | Crescente | -2.93%* | 2.56 | 5/5 | 95/100 |
-| BBSE3 | 7 anos | Crescente | 9.70% | -0.63 | 4/5 | 85/100 |
-| ITUB4 | 7 anos | Crescente | 19.82% | — | 4/5 | 90/100 |
-| MXRF11 | 7 anos | Crescente | — | — | 3/5 | 30/100 |
-| KNCR11 | 7 anos | Crescente | — | — | 4/5 | 55/100 |
-
-*SBSP3: FCF negativo por capex de expansão (esperado e positivo no longo prazo)
-
----
-
-## Metodologia Utilizada
-
-Descrita em detalhe no arquivo `METODOLOGIA_INVESTIMENTOS.md`. Resumo:
-
-- **Base teórica:** Graham, Buffett, Barsi, Bazin, Piotroski, Altman, Markowitz
-- **10 critérios:** Valuation, Rentabilidade, FCF, Dividendos, Endividamento, Crescimento, Consistência Histórica, Moat, Governança, Insiders
-- **Score 0-100** com pesos definidos
-- **Dados reais** de brapi.dev (Premium) e FMP (Pago)
-- **Sem análise técnica** (por escolha do investidor)
+| 1 | SUZB3 | Crescimento | 25 | R$47.53 | R$1.188,25 | 77.1 |
+| 2 | INTB3 | Crescimento | 80 | R$14.39 | R$1.151,20 | 78.5 |
+| 3 | BBSE3 | Dividendos | 20 | R$35.01 | R$700,20 | 82.5 |
+| 4 | ITUB4 | Dividendos | 13 | R$46.98 | R$610,74 | 81.2 |
+| 5 | MXRF11 | FII | 68 | R$9.88 | R$671,84 | — |
+| 6 | KNCR11 | FII | 6 | R$106.35 | R$638,10 | — |
+| 7 | NASD11 | ETF Intl | 54 | R$18.32 | R$989,28 | — |
+| 8 | Tesouro Selic | Reserva | — | — | R$670,00 | — |
+| | | | | **Total** | **R$6.619,55** | |
+| | | | | **Troco** | **R$80,45** | |
 
 ---
 
-## Próximos Passos
+## Por que WIZC3 não entrou apesar de #1
 
-1. **Executar as ordens na XP** conforme tabela da carteira
-2. **Reavaliar trimestralmente** quando saírem resultados (maio, agosto, novembro)
-3. **Reinvestir dividendos** seguindo a mesma metodologia
-4. **Quando SELIC cair abaixo de 10%:** Migrar parte dos FIIs de papel para tijolo
-5. **Se algum ativo cair abaixo de score 40:** Reavaliar e considerar troca
+WIZC3 tem o maior score (85.5) mas **não** entrou na carteira por 2 motivos:
+
+1. **Dividendos em tendência declinante** — para a fatia de dividendos, prefiro BBSE3/ITUB4 com tendência crescente.
+2. **Dependência da Caixa Econômica** — a Wiz distribui seguros exclusivamente via rede da Caixa. Se a Caixa mudar o contrato, a Wiz perde tudo. É um risco de concentração de canal. BBSE3 tem o mesmo risco (depende do BB), mas o BB é mais estável que a Caixa.
+
+Para a fatia de crescimento, INTB3 (score 78.5) é mais diversificada e com dívida líquida negativa.
+
+**WIZC3 fica na watchlist** como primeira substituta caso BBSE3 ou INTB3 tropecem.
 
 ---
 
-> *Este relatório é educativo e baseado em dados reais de mercado. Não constitui recomendação profissional de investimento. Consulte seu assessor na XP antes de executar.*
+## Descartados — Por que NÃO entraram
+
+### Descartados com score alto
+
+| Ativo | Score | Motivo |
+|---|---|---|
+| ABEV3 | 76.4 | Boa empresa, mas FCF Yield 3.3% fraco e crescimento estagnado (3%) |
+| BBDC4 | 75.8 | Score bom, mas dividendos em tendência **declinante**. ITUB4 é melhor. |
+| RECV3 | 75.2 | DY 9.1% atrativo, mas FCF Yield **-1.1%** (negativo) e depende do petróleo |
+| CXSE3 | 74.1 | Governança **-3** (Caixa = estatal). Sem isso seria 77.1. |
+| PETR4 | 72.3 | Score bom APESAR de penalidade -5 de governança. Dividendos **declinantes** (R$15→R$3 em 3 anos). |
+| CYRE3 | 69.8 | DY 13.9% enganoso (extraordinário). FCF **-11.9%**. Construção com SELIC 14.75% é risco. |
+| DIRR3 | 69.6 | ROE 42% incrível mas Dív/EBITDA **6.8** = muito alavancada. DY 24.9% insustentável. |
+
+### Descartados com score médio
+
+| Ativo | Score | Motivo |
+|---|---|---|
+| WEGE3 | 60.2 | P/L 30.9 = cara. FCF Yield 1.1%. Empresa excelente, preço proibitivo. |
+| SBSP3 | 58.4 | P/L 23.9, FCF -2.9%. Moat forte mas números atuais não compensam. |
+| CMIG4 | 58.6 | Governança -5 (estatal MG). Sem penalidade seria 63.6. |
+| VALE3 | 54.4 | P/L 33.2, ROE 6%. Dividendos declinantes. China desacelerando. |
+| TAEE11 | 59.3 | Dív/EBITDA 4.7, FCF negativo. Dividendos declinantes. |
+
+---
+
+## Metodologia Aplicada
+
+Cada ativo foi avaliado nos 10 critérios de `METODOLOGIA_INVESTIMENTOS.md`:
+
+1. **Valuation (20%)** — P/L, P/VP, EV/EBITDA
+2. **Rentabilidade (20%)** — ROE, margens (líquida, bruta, operacional)
+3. **FCF (15%)** — FCF Yield, FCF/Dívida Total
+4. **Dividendos (15%)** — DY real 12m, payout, anos pagando, tendência
+5. **Endividamento (10%)** — Dív.Líq/EBITDA, Liq.Corrente, Dív/Equity
+6. **Crescimento (10%)** — Crescimento receita e lucro
+7. **Consistência (5%)** — Histórico de resultados
+8. **Moat (5%)** — Vantagem competitiva qualitativa
+9. **Governança (bônus)** — NM +3, estatal -5, tag along 80% -2
+10. **Insiders (bônus)** — Não disponível via API para BR
+
+**Fórmula:** Score = soma ponderada dos 8 critérios + bônus governança, limitado a 0-100.
+
+---
+
+> *Análise com dados reais de 17/04/2026 via brapi.dev e FMP. Não constitui recomendação profissional.*
