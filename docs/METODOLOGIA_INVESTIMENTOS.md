@@ -171,20 +171,30 @@ Usados como **tie-breaker** (desempate), não como fator principal. Piotroski fu
 
 ```
 Score Base = (
-    Valuation             × 0.20 +
-    Rentabilidade         × 0.20 +
-    FCF / Earnings Quality × 0.15 +
-    Dividendos            × 0.15 +
-    Endividamento         × 0.15 +
-    Crescimento           × 0.10 +
-    [remanescente 0.05 → neutro 50 pts]
-)
+    Valuation             × 20% +
+    Rentabilidade         × 20% +
+    Qualidade dos Lucros  × 15% +
+    Dividendos            × 15% +
+    Endividamento         × 18% +
+    Crescimento           × 12%
+)                         = 100%
 
-Score Final = Score Base + Bônus Piotroski + Bônus Altman Z
-             (limitado entre 0 e 100)
+Score Final = Score Base
+            + Bônus Piotroski (±2 pts)
+            + Bônus Altman Z (±2/3 pts)
+            - Penalidade iliquidez (-3 pts se volume < 50k/dia)
+            (limitado entre 0 e 100)
 ```
 
-**Nota:** Os critérios qualitativos (Moat, Governança, Insiders) documentados abaixo NÃO entram no score automatizado. São avaliados manualmente na análise qualitativa (Fase 3 do processo) e influenciam a decisão final de compra, mas não o número do score.
+**Ajustes v4:**
+- Pesos somam 100% (sem remanescente neutro). Endividamento subiu de 15→18% e Crescimento de 10→12%.
+- **Penalidade de liquidez:** Ações com volume médio < 50.000/dia perdem 3 pts para evitar small caps ilíquidas em portfolio pequeno.
+
+**Nota:** Os critérios qualitativos (Moat, Governança, Insiders) NÃO entram no score automatizado. São avaliados na Fase 3 (análise qualitativa) e podem vetar a decisão de compra.
+
+**Validação futura:** Quando disponível, rodar o scoring v4 em dados históricos (bolsai `/fundamentals/{ticker}/history` tem até 20 anos trimestrais) para verificar se ações com score 80+ historicamente entregaram retorno ajustado ao risco superior ao Ibovespa. Isso validaria o modelo estatisticamente.
+
+**FCF (versão futura):** Quando a bolsai disponibilizar DFC calculado ou FCF direto, integrar no Critério 3 como média com Earnings Yield. Reduzir peso do EY para 40% e dar FCF Yield 60% (caixa real > lucro contábil).
 
 ### Classificação
 

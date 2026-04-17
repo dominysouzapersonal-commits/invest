@@ -7,8 +7,8 @@ class ScoringWeights(BaseModel):
     weight_profitability: int = 20
     weight_fcf_quality: int = 15
     weight_dividends: int = 15
-    weight_debt: int = 15
-    weight_growth: int = 10
+    weight_debt: int = 18
+    weight_growth: int = 12
 
 
 class AnalysisRequest(BaseModel):

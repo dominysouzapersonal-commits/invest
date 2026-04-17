@@ -478,6 +478,13 @@ def calculate_score(data: FundamentalData, weights: ScoringWeights | None = None
     ) / w_total
 
     bonus = _advanced_score_adjustment(data)
+
+    # Liquidity penalty for illiquid stocks (avg_volume < 50k/day)
+    if data.avg_volume is not None and data.avg_volume < 50000:
+        bonus -= 3
+    elif data.volume is not None and data.volume < 50000:
+        bonus -= 3
+
     total = round(min(100, max(0, base_total + bonus)), 1)
 
     all_details: dict = {
