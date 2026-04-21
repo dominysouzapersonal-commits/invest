@@ -1,6 +1,6 @@
 # Relatório Completo de Análise de Investimentos (v4 — Final)
 
-> **Data:** 18 de abril de 2026
+> **Data:** 21 de abril de 2026 *(carteira: preços conferidos nesta data)*
 > **Capital:** R$ 6.700
 > **Perfil:** Moderado, longo prazo, XP Investimentos
 > **Ativos analisados:** 144 ações (toda a B3) + 37 FIIs + 20 ETFs = **201 ativos**
@@ -51,6 +51,8 @@
 
 ## Carteira Final — R$ 6.700
 
+O **R$ 6.700** é o **capital disponível** (teto de caixa). As **porcentagens** (35% crescimento, 20% dividendos, etc.) são **metas de alocação** sobre esse teto — mas as **quantidades em cotas/ações inteiras** (100 INTB3, 68 MXRF11, 54 NASD11…) **não foram recalculadas** para fechar exatamente em R$ 6.700, nem para deixar **integralmente** os R$ 670 (10%) em Selic depois de comprar tudo. Por isso a soma “carteira + reserva cheia” **pode ultrapassar** os R$ 6.700 no papel: isso já ocorria na versão de 18/04 (total ~R$ 6.907 **incluindo** a linha de Selic). **Na prática**, com R$ 6.700, ao executar a grade completa o que sobra para Tesouro Selic/CDB é só o **saldo livre** (na execução, por exemplo **~R$ 50** — preço médio, taxas e arredondamentos).
+
 ### Decisão por categoria com justificativa
 
 **Crescimento (35% = R$ 2.345)**
@@ -97,9 +99,9 @@
 
 | ETF | Ret 1a | Volume | Por que |
 |---|---|---|---|
-| **NASD11** | +8.0% | 1.3M/dia | Nasdaq 100, R$18.32 (54 cotas), mais líquido |
+| **NASD11** | +8.0% | 1.3M/dia | Nasdaq 100, R$18,43 (54 cotas), mais líquido |
 
-**Reserva (10% = R$ 670)** — Tesouro Selic / CDB 100% CDI
+**Reserva (meta 10% ≈ R$ 670)** — Tesouro Selic / CDB 100% CDI: **só cabe “cheia”** se você **reduzir** alguma quantidade na grade acima; caso contrário, use o **saldo que sobrar** depois das ordens (ex.: **~R$ 50** na sua execução).
 
 ---
 
@@ -107,15 +109,22 @@
 
 | # | Ticker na XP | Mercado | Categoria | Qtd | Preço | Total | Score |
 |---|---|---|---|---|---|---|---|
-| 1 | **INTB3** | Lote (100) | Crescimento | 100 | R$14.39 | R$1.439,00 | 80.0 |
-| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47.53 | R$1.188,25 | 75.8 |
-| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$35.01 | R$700,20 | 86.4 |
-| 4 | **ITUB4F** | Fracionário | Dividendos | 13 | R$46.98 | R$610,74 | 77.9 |
-| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9.88 | R$671,84 | — |
-| 6 | **KNCR11** | Lote (1) | FII | 6 | R$106.35 | R$638,10 | — |
-| 7 | **NASD11** | Lote (1) | ETF Intl | 54 | R$18.32 | R$989,28 | — |
-| 8 | **Tesouro Selic** | Renda Fixa | Reserva | — | — | R$670,00 | — |
-| | | | | | **Total** | **R$6.907,41** | |
+| 1 | **INTB3** | Lote (100) | Crescimento | 100 | R$14,70 | R$1.470,00 | 80.0 |
+| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47,80 | R$1.195,00 | 75.8 |
+| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$35,28 | R$705,60 | 86.4 |
+| 4 | **ITUB4F** | Fracionário | Dividendos | 13 | R$46,37 | R$602,81 | 77.9 |
+| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9,95 | R$676,60 | — |
+| 6 | **KNCR11** | Lote (1) | FII | 6 | R$107,13 | R$642,78 | — |
+| 7 | **NASD11** | Lote (1) | ETF Intl | 54 | R$18,43 | R$995,22 | — |
+| | | | | | **Subtotal (linhas 1–7)** | **R$6.288,01** | |
+| 8 | **Tesouro Selic / CDI** | Renda Fixa | Reserva | — | — | *saldo livre* | — |
+| | | | | | **Capital disponível** | **R$6.700,00** | |
+
+*Com os preços desta tabela, **R$ 6.700 − R$ 6.288,01 ≈ R$ 411,99** ficariam teoricamente para RF — não R$ 670. O valor **~R$ 50** que sobrou na sua execução reflete **preço médio de compra**, taxas e possíveis diferenças de cotação em relação à linha “Preço” acima.*
+
+*Preços em **21/04/2026** via API em produção (`investanalytics-api.onrender.com`): **brapi Premium** (`/api/assets/{ticker}/quote`); **NASD11** pelo detalhe `/api/assets/NASD11`. Quantidades iguais ao plano.*
+
+*Conferência **bolsai** (CVM/B3): use `python3 scripts/bolsai_carteira_prices.py` com `BOLSAI_API_KEY` (ou `GET /api/assets/{ticker}/bolsai-quote` após publicar a versão atual do backend). **NASD11** não usa bolsai no motor do app (ETF BR → brapi); FIIs usam `close_price` em `/fiis/{ticker}`; ações usam `close` em `/stocks/{ticker}/quote`. Aqui não havia chave bolsai para regravar a tabela; em papéis líquidos o **close** da bolsai e a brapi costumam ficar **muito próximos** (diferença típica de centavos conforme snapshot/horário).*
 
 *Como comprar na XP:*
 - **Ações com F** (SUZB3F, BBSE3F, ITUB4F): mercado fracionário, compra de 1 a 99 ações. No app da XP, basta digitar a quantidade — ele envia automaticamente para o fracionário.

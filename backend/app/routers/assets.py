@@ -1,6 +1,6 @@
 import logging
 from fastapi import APIRouter, Query, HTTPException
-from app.services.data_providers import brapi, fmp
+from app.services.data_providers import brapi, fmp, bolsai
 from app.services.analysis_engine import get_full_asset_data, get_historical, detect_asset_type
 from app.schemas.asset import AssetSearch, AssetDetail
 from app.services.scoring import calculate_score
@@ -39,6 +39,32 @@ async def get_asset_detail(ticker: str, period: str = "1y"):
         historical_prices=historical,
         score=score,
     )
+
+
+@router.get("/{ticker}/bolsai-quote")
+async def get_bolsai_quote(ticker: str):
+    """Última cotação B3 via bolsai (GET /stocks/.../quote ou /fiis/...). ETF BR costuma não existir na bolsai — use /quote (brapi)."""
+    clean = ticker.upper().replace(".SA", "")
+    asset_type = detect_asset_type(clean)
+    if asset_type == "fii":
+        data = await bolsai.get_fii(clean)
+        if not data:
+            return None
+        px = data.get("close_price")
+        return {"ticker": clean, "source": "bolsai", "endpoint": "fiis", "price": px}
+    if asset_type == "br_etf":
+        q = await bolsai.get_quote(clean)
+        if not q:
+            return None
+        px = q.get("close") if isinstance(q, dict) else None
+        return {"ticker": clean, "source": "bolsai", "endpoint": "stocks/quote", "price": px}
+    if asset_type in ("br_stock", "bdr"):
+        q = await bolsai.get_quote(clean)
+        if not q:
+            return None
+        px = q.get("close") if isinstance(q, dict) else None
+        return {"ticker": clean, "source": "bolsai", "endpoint": "stocks/quote", "price": px}
+    return None
 
 
 @router.get("/{ticker}/quote")
