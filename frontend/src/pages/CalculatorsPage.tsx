@@ -2,15 +2,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Calculator, TrendingUp, Flame, Coffee, Compass, DollarSign, PiggyBank } from 'lucide-react';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || '';
+import { API_BASE_URL } from '../config/apiBase';
 
 function useMacro() {
   return useQuery({
     queryKey: ['macro'],
     queryFn: async () => {
       const token = localStorage.getItem('token');
-      const { data } = await axios.get(`${API_URL}/api/report/macro`, {
+      const { data } = await axios.get(`${API_BASE_URL}/api/report/macro`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       return data as { selic: number | null; ipca: number | null; usd_brl: number | null };
