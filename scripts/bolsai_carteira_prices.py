@@ -17,6 +17,8 @@ import urllib.error
 import urllib.request
 
 BASE = "https://api.usebolsai.com/api/v1"
+# ETF NASD11 não existe na bolsai (404); mesmo preço usado no app (brapi via API pública).
+NASD_FALLBACK_URL = "https://investanalytics-api.onrender.com/api/assets/NASD11"
 
 # Mesma grade do RELATORIO_COMPLETO.md
 ROWS = [
@@ -47,7 +49,14 @@ def load_dotenv() -> None:
 
 def http_get(path: str, api_key: str) -> dict | list | None:
     url = f"{BASE}/{path}"
-    req = urllib.request.Request(url, headers={"X-API-Key": api_key})
+    req = urllib.request.Request(
+        url,
+        headers={
+            "X-API-Key": api_key,
+            "User-Agent": "Mozilla/5.0 (compatible; Investimentos/1.0; +https://github.com/dominysouzapersonal-commits/invest)",
+            "Accept": "application/json",
+        },
+    )
     try:
         with urllib.request.urlopen(req, timeout=25) as resp:
             body = resp.read().decode()
@@ -57,6 +66,24 @@ def http_get(path: str, api_key: str) -> dict | list | None:
     except urllib.error.HTTPError as e:
         err = e.read().decode()[:500]
         print(f"HTTP {e.code} {path}: {err}", file=sys.stderr)
+        return None
+
+
+def nasd11_price_brapi_public() -> float | None:
+    req = urllib.request.Request(
+        NASD_FALLBACK_URL,
+        headers={
+            "User-Agent": "Mozilla/5.0 (compatible; Investimentos/1.0)",
+            "Accept": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode())
+        f = data.get("fundamentals") or {}
+        p = f.get("price")
+        return float(p) if p is not None else None
+    except (urllib.error.URLError, ValueError, TypeError, json.JSONDecodeError):
         return None
 
 
@@ -91,9 +118,12 @@ def main() -> int:
             if isinstance(q, dict):
                 price = q.get("close_price")
         else:
-            q = http_get(f"stocks/{ticker}/quote", key)
-            if isinstance(q, dict):
-                price = q.get("close")
+            if ticker == "NASD11":
+                price = nasd11_price_brapi_public()
+            else:
+                q = http_get(f"stocks/{ticker}/quote", key)
+                if isinstance(q, dict):
+                    price = q.get("close")
 
         if price is None:
             print(f"{ticker}\t{kind}\t(null)\t-", file=sys.stderr)

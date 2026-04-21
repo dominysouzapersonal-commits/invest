@@ -11,7 +11,13 @@ BASE_URL = "https://api.usebolsai.com/api/v1"
 def _headers() -> dict:
     settings = get_settings()
     key = settings.bolsai_api_key
-    return {"X-API-Key": key} if key else {}
+    if not key:
+        return {}
+    return {
+        "X-API-Key": key,
+        "User-Agent": "InvestAnalytics/2.0 (https://github.com/dominysouzapersonal-commits/invest)",
+        "Accept": "application/json",
+    }
 
 
 async def _get(path: str, params: dict | None = None) -> dict | list | None:

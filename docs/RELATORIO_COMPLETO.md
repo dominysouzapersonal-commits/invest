@@ -109,22 +109,20 @@ O **R$ 6.700** é o **capital disponível** (teto de caixa). As **porcentagens**
 
 | # | Ticker na XP | Mercado | Categoria | Qtd | Preço | Total | Score |
 |---|---|---|---|---|---|---|---|
-| 1 | **INTB3** | Lote (100) | Crescimento | 100 | R$14,70 | R$1.470,00 | 80.0 |
-| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47,80 | R$1.195,00 | 75.8 |
-| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$35,28 | R$705,60 | 86.4 |
-| 4 | **ITUB4F** | Fracionário | Dividendos | 13 | R$46,37 | R$602,81 | 77.9 |
-| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9,95 | R$676,60 | — |
-| 6 | **KNCR11** | Lote (1) | FII | 6 | R$107,13 | R$642,78 | — |
+| 1 | **INTB3** | Lote (100) | Crescimento | 100 | R$14,67 | R$1.467,00 | 80.0 |
+| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47,93 | R$1.198,25 | 75.8 |
+| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$34,92 | R$698,40 | 86.4 |
+| 4 | **ITUB4F** | Fracionário | Dividendos | 13 | R$46,80 | R$608,40 | 77.9 |
+| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9,87 | R$671,16 | — |
+| 6 | **KNCR11** | Lote (1) | FII | 6 | R$106,48 | R$638,88 | — |
 | 7 | **NASD11** | Lote (1) | ETF Intl | 54 | R$18,43 | R$995,22 | — |
-| | | | | | **Subtotal (linhas 1–7)** | **R$6.288,01** | |
+| | | | | | **Subtotal (linhas 1–7)** | **R$6.277,31** | |
 | 8 | **Tesouro Selic / CDI** | Renda Fixa | Reserva | — | — | *saldo livre* | — |
 | | | | | | **Capital disponível** | **R$6.700,00** | |
 
-*Com os preços desta tabela, **R$ 6.700 − R$ 6.288,01 ≈ R$ 411,99** ficariam teoricamente para RF — não R$ 670. O valor **~R$ 50** que sobrou na sua execução reflete **preço médio de compra**, taxas e possíveis diferenças de cotação em relação à linha “Preço” acima.*
+*Com os preços desta tabela, **R$ 6.700 − R$ 6.277,31 = R$ 422,69** ficariam teoricamente para RF — não R$ 670. O **~R$ 50** que sobrou na sua execução ainda reflete **preço médio de compra**, taxas e diferença de instantâneo em relação a estes preços de referência.*
 
-*Preços em **21/04/2026** via API em produção (`investanalytics-api.onrender.com`): **brapi Premium** (`/api/assets/{ticker}/quote`); **NASD11** pelo detalhe `/api/assets/NASD11`. Quantidades iguais ao plano.*
-
-*Conferência **bolsai** (CVM/B3): use `python3 scripts/bolsai_carteira_prices.py` com `BOLSAI_API_KEY` (ou `GET /api/assets/{ticker}/bolsai-quote` após publicar a versão atual do backend). **NASD11** não usa bolsai no motor do app (ETF BR → brapi); FIIs usam `close_price` em `/fiis/{ticker}`; ações usam `close` em `/stocks/{ticker}/quote`. Aqui não havia chave bolsai para regravar a tabela; em papéis líquidos o **close** da bolsai e a brapi costumam ficar **muito próximos** (diferença típica de centavos conforme snapshot/horário).*
+*Preços **21/04/2026**: linhas 1–6 via **bolsai** (`/stocks/{ticker}/quote` e `/fiis/{ticker}` → `close` / `close_price`). **NASD11**: a bolsai **não retorna** esse ETF (`Ticker not found`); usamos o mesmo preço do app (**brapi**, `GET /api/assets/NASD11` em produção). Para repetir: `python3 scripts/bolsai_carteira_prices.py` com `BOLSAI_API_KEY`, ou `GET /api/assets/{ticker}/bolsai-quote` no backend.*
 
 *Como comprar na XP:*
 - **Ações com F** (SUZB3F, BBSE3F, ITUB4F): mercado fracionário, compra de 1 a 99 ações. No app da XP, basta digitar a quantidade — ele envia automaticamente para o fracionário.
