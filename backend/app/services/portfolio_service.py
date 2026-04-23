@@ -43,6 +43,19 @@ async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
         except Exception:
             pass
 
+        # Fallback individual para tickers BR que não voltaram no batch
+        # (brapi às vezes omite ETFs BR / FIIs raros do endpoint batch).
+        missing = [t for t in br_to_fetch if t not in prices]
+        for ticker in missing:
+            try:
+                quote = await brapi.get_quote(ticker)
+                p = quote.get("price") if quote else None
+                if isinstance(p, (int, float)):
+                    prices[ticker] = float(p)
+                    await set_cached(f"portfolio:price:{ticker}", {"price": float(p)}, "brapi", SUMMARY_PRICES_TTL_MIN)
+            except Exception:
+                pass
+
     for ticker, _ in us_to_fetch:
         try:
             quote = await fmp.get_quote(ticker)
@@ -76,8 +89,9 @@ async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> Portf
         pl = current_value - invested if current_value else None
         pl_pct = (pl / invested * 100) if pl and invested > 0 else None
 
-        if current_value:
-            total_current += current_value
+        # Usa avg_price (custo) como fallback no totalizador quando o provider
+        # não devolveu preço — evita "perda fake" igual ao invested da linha.
+        total_current += current_value if current_value is not None else invested
 
         position_responses.append(PositionResponse(
             id=pos["id"],
