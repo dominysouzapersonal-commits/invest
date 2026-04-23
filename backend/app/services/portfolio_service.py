@@ -11,17 +11,16 @@ BR_TYPES = ("br_stock", "fii", "bdr", "br_etf")
 
 
 async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
-    """Busca preços em lote: 1 chamada brapi para todos os BR + 1 FMP por ticker US.
-
-    Cacheado por 60s no Mongo (`portfolio:prices:<ticker>`), de modo que múltiplos
-    refreshes ou múltiplos usuários compartilham as cotações sem multiplicar a quota.
+    """Busca preços com cache 60s. Tenta batch da brapi (1 req para todos os BR),
+    e depois faz fallback individual para qualquer ticker que não voltou
+    (brapi omite ETFs BR e alguns FIIs do endpoint batch).
     """
     prices: dict[str, float] = {}
     br_to_fetch: list[str] = []
     us_to_fetch: list[tuple[str, str]] = []
 
     for pos in positions:
-        ticker = pos["ticker"]
+        ticker = pos["ticker"].upper()
         cached = await get_cached(f"portfolio:price:{ticker}")
         if cached and isinstance(cached.get("price"), (int, float)):
             prices[ticker] = float(cached["price"])
@@ -31,6 +30,7 @@ async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
         else:
             us_to_fetch.append((ticker, pos["asset_type"]))
 
+    # 1) Batch para BR (1 req cobre até 20 tickers)
     if br_to_fetch:
         try:
             batch = await brapi.get_quotes_batch(br_to_fetch)
@@ -43,10 +43,9 @@ async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
         except Exception:
             pass
 
-        # Fallback individual para tickers BR que não voltaram no batch
-        # (brapi às vezes omite ETFs BR / FIIs raros do endpoint batch).
-        missing = [t for t in br_to_fetch if t not in prices]
-        for ticker in missing:
+        # 2) Fallback individual para BR que não veio no batch (ETFs BR, FIIs raros)
+        missing_br = [t for t in br_to_fetch if t not in prices]
+        for ticker in missing_br:
             try:
                 quote = await brapi.get_quote(ticker)
                 p = quote.get("price") if quote else None
@@ -56,6 +55,7 @@ async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
             except Exception:
                 pass
 
+    # 3) US individual
     for ticker, _ in us_to_fetch:
         try:
             quote = await fmp.get_quote(ticker)

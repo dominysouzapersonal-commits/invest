@@ -1,8 +1,27 @@
 from contextlib import asynccontextmanager
+import os
+import subprocess
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import connect_db, close_db
 from app.routers import auth, assets, analysis, portfolio, compare, watchlist, report
+
+
+def _git_sha() -> str:
+    sha = os.environ.get("RENDER_GIT_COMMIT") or os.environ.get("GIT_SHA")
+    if sha:
+        return sha[:7]
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            timeout=2,
+        ).decode().strip()
+    except Exception:
+        return "unknown"
+
+
+GIT_SHA = _git_sha()
 
 
 @asynccontextmanager
@@ -39,4 +58,4 @@ app.include_router(report.router, prefix="/api/report", tags=["Report"])
 @app.get("/")
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "version": "2.0.0"}
+    return {"status": "ok", "version": "2.0.0", "sha": GIT_SHA}
