@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query
 from app.database import get_db
 from app.models.portfolio import (
     find_positions, find_position_by_ticker, create_position,
@@ -13,6 +13,19 @@ from app.utils.xp_parser import parse_xp_extract
 from app.utils.auth import get_current_user
 
 router = APIRouter()
+
+
+@router.get("/quotes-bulk")
+async def quotes_bulk(tickers: str = Query(..., description="Tickers separados por vírgula. Ex: INTB3,SUZB3,NASD11")):
+    """Endpoint PÚBLICO de cotações em lote (sem auth) — usado pela página da carteira fixa.
+    Cacheado 60s no backend, sem afetar a quota da brapi."""
+    parsed = [t.strip().upper() for t in tickers.split(",") if t.strip()]
+    if not parsed:
+        return {"prices": {}}
+    if len(parsed) > 30:
+        raise HTTPException(400, "Máximo 30 tickers por request")
+    prices = await portfolio_service.get_prices_for_tickers(parsed)
+    return {"prices": prices}
 
 
 @router.get("/summary", response_model=PortfolioSummary)

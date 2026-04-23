@@ -89,6 +89,11 @@ export const portfolioApi = {
     form.append('file', file);
     return api.post('/portfolio/import', form).then(r => r.data);
   },
+
+  getQuotesBulk: (tickers: string[]) =>
+    api.get<{ prices: Record<string, number> }>('/portfolio/quotes-bulk', {
+      params: { tickers: tickers.join(',') },
+    }).then(r => r.data),
 };
 
 export const compareApi = {

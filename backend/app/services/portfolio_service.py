@@ -15,6 +15,25 @@ async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
     e depois faz fallback individual para qualquer ticker que não voltou
     (brapi omite ETFs BR e alguns FIIs do endpoint batch).
     """
+    fake_positions = [
+        {"ticker": p["ticker"], "asset_type": p.get("asset_type", "br_stock")}
+        for p in positions
+    ]
+    return await get_prices_for_positions(fake_positions)
+
+
+async def get_prices_for_tickers(tickers: list[str]) -> dict[str, float]:
+    """Versão simplificada para o endpoint público: recebe só tickers e infere o tipo."""
+    from app.services.analysis_engine import detect_asset_type
+
+    positions = [
+        {"ticker": t.upper(), "asset_type": detect_asset_type(t.upper())}
+        for t in tickers
+    ]
+    return await get_prices_for_positions(positions)
+
+
+async def get_prices_for_positions(positions: list[dict]) -> dict[str, float]:
     prices: dict[str, float] = {}
     br_to_fetch: list[str] = []
     us_to_fetch: list[tuple[str, str]] = []
