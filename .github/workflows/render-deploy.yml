@@ -1,0 +1,38 @@
+name: Trigger Render Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/render-deploy.yml'
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_ID: srv-d7gin7hj2pic73fbo3f0
+        run: |
+          if [ -z "$RENDER_API_KEY" ]; then
+            echo "::error::RENDER_API_KEY secret missing"
+            exit 1
+          fi
+          RESP=$(curl -sS -w "\n%{http_code}" -X POST \
+            "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": "do_not_clear"}')
+          BODY=$(echo "$RESP" | sed '$d')
+          CODE=$(echo "$RESP" | tail -n1)
+          echo "HTTP $CODE"
+          echo "$BODY"
+          if [ "$CODE" != "201" ] && [ "$CODE" != "202" ]; then
+            exit 1
+          fi
+          DEPLOY_ID=$(echo "$BODY" | python3 -c "import json,sys;print(json.load(sys.stdin).get('id',''))")
+          echo "Triggered deploy: $DEPLOY_ID"
+          echo "Dashboard: https://dashboard.render.com/web/${SERVICE_ID}/deploys/${DEPLOY_ID}"
