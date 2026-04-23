@@ -20,12 +20,12 @@ BASE = "https://api.usebolsai.com/api/v1"
 # ETF NASD11 não existe na bolsai (404); mesmo preço usado no app (brapi via API pública).
 NASD_FALLBACK_URL = "https://investanalytics-api.onrender.com/api/assets/NASD11"
 
-# Mesma grade do RELATORIO_COMPLETO.md
+# Mesma grade do RELATORIO_COMPLETO.md (revisão 23/04/2026)
 ROWS = [
-    ("INTB3", "stock", 100),
+    ("INTB3", "stock", 76),
     ("SUZB3", "stock", 25),
     ("BBSE3", "stock", 20),
-    ("ITUB4", "stock", 13),
+    ("ITUB4", "stock", 14),
     ("MXRF11", "fii", 68),
     ("KNCR11", "fii", 6),
     ("NASD11", "etf", 54),

@@ -2,10 +2,64 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.models.portfolio import find_positions, find_position_by_ticker, create_position, update_position, create_transaction
 from app.schemas.portfolio import PortfolioSummary, PositionResponse
 from app.services.data_providers import brapi, fmp
+from app.utils.cache import get_cached, set_cached
+
+# TTL curto (60s) para preços do summary — preserva quota da brapi
+# mesmo com o frontend dando refetch a cada 1 min.
+SUMMARY_PRICES_TTL_MIN = 1
+BR_TYPES = ("br_stock", "fii", "bdr", "br_etf")
+
+
+async def _get_prices_bulk(positions: list[dict]) -> dict[str, float]:
+    """Busca preços em lote: 1 chamada brapi para todos os BR + 1 FMP por ticker US.
+
+    Cacheado por 60s no Mongo (`portfolio:prices:<ticker>`), de modo que múltiplos
+    refreshes ou múltiplos usuários compartilham as cotações sem multiplicar a quota.
+    """
+    prices: dict[str, float] = {}
+    br_to_fetch: list[str] = []
+    us_to_fetch: list[tuple[str, str]] = []
+
+    for pos in positions:
+        ticker = pos["ticker"]
+        cached = await get_cached(f"portfolio:price:{ticker}")
+        if cached and isinstance(cached.get("price"), (int, float)):
+            prices[ticker] = float(cached["price"])
+            continue
+        if pos["asset_type"] in BR_TYPES:
+            br_to_fetch.append(ticker)
+        else:
+            us_to_fetch.append((ticker, pos["asset_type"]))
+
+    if br_to_fetch:
+        try:
+            batch = await brapi.get_quotes_batch(br_to_fetch)
+            for q in batch or []:
+                t = (q.get("ticker") or q.get("symbol") or "").upper()
+                p = q.get("price") or q.get("regularMarketPrice")
+                if t and isinstance(p, (int, float)):
+                    prices[t] = float(p)
+                    await set_cached(f"portfolio:price:{t}", {"price": float(p)}, "brapi", SUMMARY_PRICES_TTL_MIN)
+        except Exception:
+            pass
+
+    for ticker, _ in us_to_fetch:
+        try:
+            quote = await fmp.get_quote(ticker)
+            p = quote.get("price") if quote else None
+            if isinstance(p, (int, float)):
+                prices[ticker] = float(p)
+                await set_cached(f"portfolio:price:{ticker}", {"price": float(p)}, "fmp", SUMMARY_PRICES_TTL_MIN)
+        except Exception:
+            pass
+
+    return prices
 
 
 async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> PortfolioSummary:
     positions = await find_positions(db, user_id)
+
+    prices = await _get_prices_bulk(positions)
 
     position_responses = []
     total_invested = 0.0
@@ -17,7 +71,7 @@ async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> Portf
         invested = pos["quantity"] * pos["avg_price"]
         total_invested += invested
 
-        current_price = await _get_current_price(pos["ticker"], pos["asset_type"])
+        current_price = prices.get(pos["ticker"])
         current_value = pos["quantity"] * current_price if current_price else None
         pl = current_value - invested if current_value else None
         pl_pct = (pl / invested * 100) if pl and invested > 0 else None
@@ -65,7 +119,7 @@ async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> Portf
 
 async def _get_current_price(ticker: str, asset_type: str) -> float | None:
     try:
-        if asset_type in ("br_stock", "fii", "bdr"):
+        if asset_type in BR_TYPES:
             quote = await brapi.get_quote(ticker)
             return quote.get("price") if quote else None
         else:

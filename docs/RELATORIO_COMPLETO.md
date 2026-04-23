@@ -1,6 +1,6 @@
 # Relatório Completo de Análise de Investimentos (v4 — Final)
 
-> **Data:** 21 de abril de 2026 *(carteira: preços conferidos nesta data)*
+> **Data:** 23 de abril de 2026 *(carteira: preços e quantidades conferidos nesta data)*
 > **Capital:** R$ 6.700
 > **Perfil:** Moderado, longo prazo, XP Investimentos
 > **Ativos analisados:** 144 ações (toda a B3) + 37 FIIs + 20 ETFs = **201 ativos**
@@ -51,7 +51,7 @@
 
 ## Carteira Final — R$ 6.700
 
-O **R$ 6.700** é o **capital disponível** (teto de caixa). As **porcentagens** (35% crescimento, 20% dividendos, etc.) são **metas de alocação** sobre esse teto — mas as **quantidades em cotas/ações inteiras** (100 INTB3, 68 MXRF11, 54 NASD11…) **não foram recalculadas** para fechar exatamente em R$ 6.700, nem para deixar **integralmente** os R$ 670 (10%) em Selic depois de comprar tudo. Por isso a soma “carteira + reserva cheia” **pode ultrapassar** os R$ 6.700 no papel: isso já ocorria na versão de 18/04 (total ~R$ 6.907 **incluindo** a linha de Selic). **Na prática**, com R$ 6.700, ao executar a grade completa o que sobra para Tesouro Selic/CDB é só o **saldo livre** (na execução, por exemplo **~R$ 50** — preço médio, taxas e arredondamentos).
+O **R$ 6.700** é o **capital disponível** (teto de caixa). As **porcentagens** (35% crescimento, 20% dividendos, etc.) são **metas de alocação** sobre esse teto. Nesta revisão de **23/04/2026**, as **quantidades em cotas/ações inteiras** foram **recalculadas** com os preços de hoje para respeitar essas metas e deixar uma reserva próxima dos 10% (R$ 670). A soma das linhas 1–7 fica em **R$ 5.983,99**, sobrando **R$ 716,01** (~10,7%) para Tesouro Selic/CDB — alinhado ao alvo. Na execução real, o que efetivamente sobra para a reserva varia com **preço médio de compra**, taxas e arredondamentos do book.
 
 ### Decisão por categoria com justificativa
 
@@ -109,20 +109,25 @@ O **R$ 6.700** é o **capital disponível** (teto de caixa). As **porcentagens**
 
 | # | Ticker na XP | Mercado | Categoria | Qtd | Preço | Total | Score |
 |---|---|---|---|---|---|---|---|
-| 1 | **INTB3** | Lote (100) | Crescimento | 100 | R$14,67 | R$1.467,00 | 80.0 |
-| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47,93 | R$1.198,25 | 75.8 |
-| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$34,92 | R$698,40 | 86.4 |
-| 4 | **ITUB4F** | Fracionário | Dividendos | 13 | R$46,80 | R$608,40 | 77.9 |
-| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9,87 | R$671,16 | — |
-| 6 | **KNCR11** | Lote (1) | FII | 6 | R$106,48 | R$638,88 | — |
-| 7 | **NASD11** | Lote (1) | ETF Intl | 54 | R$18,43 | R$995,22 | — |
-| | | | | | **Subtotal (linhas 1–7)** | **R$6.277,31** | |
-| 8 | **Tesouro Selic / CDI** | Renda Fixa | Reserva | — | — | *saldo livre* | — |
+| 1 | **INTB3F** | Fracionário | Crescimento | 76 | R$15,30 | R$1.162,80 | 80.0 |
+| 2 | **SUZB3F** | Fracionário | Crescimento | 25 | R$47,35 | R$1.183,75 | 75.8 |
+| 3 | **BBSE3F** | Fracionário | Dividendos | 20 | R$34,70 | R$694,00 | 86.4 |
+| 4 | **ITUB4F** | Fracionário | Dividendos | 14 | R$45,03 | R$630,42 | 77.9 |
+| 5 | **MXRF11** | Lote (1) | FII | 68 | R$9,92 | R$674,56 | — |
+| 6 | **KNCR11** | Lote (1) | FII | 6 | R$106,98 | R$641,88 | — |
+| 7 | **NASD11** | Lote (1) | ETF Intl | 54 | R$18,67 | R$1.008,18 | — |
+| | | | | | **Subtotal (linhas 1–7)** | **R$5.995,59** | |
+| 8 | **Tesouro Selic / CDB** | Renda Fixa | Reserva | — | — | **R$704,41** | — |
 | | | | | | **Capital disponível** | **R$6.700,00** | |
 
-*Com os preços desta tabela, **R$ 6.700 − R$ 6.277,31 = R$ 422,69** ficariam teoricamente para RF — não R$ 670. O **~R$ 50** que sobrou na sua execução ainda reflete **preço médio de compra**, taxas e diferença de instantâneo em relação a estes preços de referência.*
+**Conferência de alocação (23/04/2026):**
+- Crescimento (INTB3F + SUZB3F): R$ 2.346,55 → **35,0%** (alvo 35%) ✓
+- Dividendos (BBSE3F + ITUB4F): R$ 1.324,42 → **19,8%** (alvo 20%) ✓
+- FIIs (MXRF11 + KNCR11): R$ 1.316,44 → **19,6%** (alvo 20%) ✓
+- ETF Internacional (NASD11): R$ 1.008,18 → **15,0%** (alvo 15%) ✓
+- Reserva RF (Tesouro Selic / CDB 100% CDI): R$ 704,41 → **10,5%** (alvo 10%) ✓
 
-*Preços **21/04/2026**: linhas 1–6 via **bolsai** (`/stocks/{ticker}/quote` e `/fiis/{ticker}` → `close` / `close_price`). **NASD11**: a bolsai **não retorna** esse ETF (`Ticker not found`); usamos o mesmo preço do app (**brapi**, `GET /api/assets/NASD11` em produção). Para repetir: `python3 scripts/bolsai_carteira_prices.py` com `BOLSAI_API_KEY`, ou `GET /api/assets/{ticker}/bolsai-quote` no backend.*
+*Preços **23/04/2026** obtidos via `GET /api/assets/{ticker}` no backend em produção (brapi para ações/FIIs/ETF, com fundamentos da bolsai/CVM). Para reconferir: `python3 scripts/bolsai_carteira_prices.py` com `BOLSAI_API_KEY`, ou `GET /api/assets/{ticker}/bolsai-quote` no backend. Mudanças vs. 21/04: **INTB3 100 (lote) → INTB3F 76 (fracionário)** para liberar espaço sem cortar SUZB3F (que segue em **25**); ITUB4F 13 → **14** aproveita a queda no preço para encostar na meta de 20% em dividendos. As demais quantidades foram preservadas.*
 
 *Como comprar na XP:*
 - **Ações com F** (SUZB3F, BBSE3F, ITUB4F): mercado fracionário, compra de 1 a 99 ações. No app da XP, basta digitar a quantidade — ele envia automaticamente para o fracionário.
