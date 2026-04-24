@@ -7,10 +7,14 @@ from app.database import get_db
 async def get_cached(key: str) -> dict | None:
     db = get_db()
     entry = await db.cache.find_one({"cache_key": key})
-    if entry and entry.get("expires_at", datetime.min.replace(tzinfo=timezone.utc)) > datetime.now(timezone.utc):
+    if not entry:
+        return None
+    expires = entry.get("expires_at")
+    if expires is not None and expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if expires and expires > datetime.now(timezone.utc):
         return json.loads(entry["data"])
-    if entry:
-        await db.cache.delete_one({"cache_key": key})
+    await db.cache.delete_one({"cache_key": key})
     return None
 
 
