@@ -104,9 +104,9 @@ async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> Portf
         total_invested += invested
 
         current_price = prices.get(pos["ticker"])
-        current_value = pos["quantity"] * current_price if current_price else None
-        pl = current_value - invested if current_value else None
-        pl_pct = (pl / invested * 100) if pl and invested > 0 else None
+        current_value = pos["quantity"] * current_price if current_price is not None else None
+        pl = current_value - invested if current_value is not None else None
+        pl_pct = (pl / invested * 100) if pl is not None and invested > 0 else None
 
         # Usa avg_price (custo) como fallback no totalizador quando o provider
         # não devolveu preço — evita "perda fake" igual ao invested da linha.
@@ -121,9 +121,9 @@ async def get_portfolio_summary(db: AsyncIOMotorDatabase, user_id: str) -> Portf
             currency=pos.get("currency", "BRL"),
             broker=pos.get("broker", "XP Investimentos"),
             current_price=current_price,
-            current_value=round(current_value, 2) if current_value else None,
-            profit_loss=round(pl, 2) if pl else None,
-            profit_loss_pct=round(pl_pct, 2) if pl_pct else None,
+            current_value=round(current_value, 2) if current_value is not None else None,
+            profit_loss=round(pl, 2) if pl is not None else None,
+            profit_loss_pct=round(pl_pct, 2) if pl_pct is not None else None,
         ))
 
         at = pos["asset_type"]
